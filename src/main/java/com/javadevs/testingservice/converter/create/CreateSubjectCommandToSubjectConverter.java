@@ -1,4 +1,4 @@
-package com.javadevs.testingservice.converter;
+package com.javadevs.testingservice.converter.create;
 
 import com.javadevs.testingservice.model.Subject;
 import com.javadevs.testingservice.model.command.CreateSubjectCommand;

@@ -3,7 +3,7 @@ package com.javadevs.testingservice.service;
 import com.javadevs.testingservice.model.Subject;
 import com.javadevs.testingservice.model.command.CreateSubjectCommand;
 import com.javadevs.testingservice.repository.SubjectRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SubjectService {
 
     private final SubjectRepository subjectRepository;
@@ -25,7 +25,7 @@ public class SubjectService {
 
     @Transactional(readOnly = true)
     public Subject findSubjectById(long id) {
-        return subjectRepository.findById(id)
+        return subjectRepository.findSubjectById(id)
                 .orElseThrow(() -> new RuntimeException((String.format("Subject with id %s not found!", id))));
     }
 

@@ -1,11 +1,12 @@
 package com.javadevs.testingservice.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.util.Set;
+
+@ToString(exclude = {"answers"})
+@EqualsAndHashCode(exclude = {"answers"})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,8 +23,10 @@ public class Question {
     private long id;
     private String question;
     private String correctAnswer;
+    private QuestionType questionType;
 
-//    private Set<String> answers;
+    @OneToMany(mappedBy = "question", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Set<Answer> answers;
 
     @ManyToOne
     @JoinColumn(name = "subject_id", referencedColumnName = "subject_id", foreignKey = @ForeignKey(name = "subject_question_fk"))

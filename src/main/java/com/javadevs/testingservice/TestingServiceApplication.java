@@ -10,4 +10,6 @@ public class TestingServiceApplication {
 		SpringApplication.run(TestingServiceApplication.class, args);
 	}
 
+	//TODO Wiecej niz jedna poprawna odpowiedz w Question
+	//TODO DTOs wielopoziomowy
 }

@@ -1,15 +1,13 @@
 package com.javadevs.testingservice.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.context.annotation.Configuration;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@ToString(exclude = {"subjectsCovered"})
+@EqualsAndHashCode(exclude = {"subjectsCovered"})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

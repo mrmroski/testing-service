@@ -1,13 +1,12 @@
 package com.javadevs.testingservice.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Set;
 
+@ToString(exclude = {"questions"})
+@EqualsAndHashCode(exclude = {"questions"})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

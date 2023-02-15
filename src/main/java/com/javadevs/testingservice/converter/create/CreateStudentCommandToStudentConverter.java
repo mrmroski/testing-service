@@ -1,4 +1,4 @@
-package com.javadevs.testingservice.converter;
+package com.javadevs.testingservice.converter.create;
 
 import com.javadevs.testingservice.model.Student;
 import com.javadevs.testingservice.model.command.CreateStudentCommand;
