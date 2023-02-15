@@ -12,7 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -26,16 +25,16 @@ public class QuestionController {
 
     @PostMapping
     public ResponseEntity<Question> saveQuestion(@RequestBody @Valid CreateQuestionCommand command) {
-        log.info("saveQuestion{}" , command);
+        log.info("saveQuestion{}", command);
         return new ResponseEntity(modelMapper
-                .map(questionService.saveQuestion(command), QuestionDto.class),HttpStatus.CREATED);
+                .map(questionService.saveQuestion(command), QuestionDto.class), HttpStatus.CREATED);
     }
 
     @GetMapping("/{questionId}")
     public ResponseEntity findQuestionById(@PathVariable("questionId") long questionId) {
         log.info("findQuestionById({})", questionId);
         return new ResponseEntity(modelMapper
-                .map(questionService.findQuestionById(questionId),QuestionDto.class), HttpStatus.OK);
+                .map(questionService.findQuestionById(questionId), QuestionDto.class), HttpStatus.OK);
     }
 
     @GetMapping

@@ -27,14 +27,14 @@ public class AnswerController {
     public ResponseEntity<Answer> saveAnswer(@RequestBody @Valid CreateAnswerCommand command) {
         log.info("saveAnswer{}", command);
         return new ResponseEntity(modelMapper
-                .map(answerService.saveAnswer(command),AnswerDto.class),HttpStatus.CREATED);
+                .map(answerService.saveAnswer(command), AnswerDto.class), HttpStatus.CREATED);
     }
 
     @GetMapping("/{answerId}")
     public ResponseEntity findAnswerById(@PathVariable("answerId") long answerId) {
         log.info("findAnswerById({})", answerId);
         return new ResponseEntity(modelMapper
-                .map(answerService.findAnswerById(answerId),AnswerDto.class),HttpStatus.OK);
+                .map(answerService.findAnswerById(answerId), AnswerDto.class), HttpStatus.OK);
     }
 
     @GetMapping

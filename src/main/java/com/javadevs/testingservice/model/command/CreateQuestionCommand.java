@@ -1,17 +1,14 @@
 package com.javadevs.testingservice.model.command;
 
-import com.javadevs.testingservice.model.Answer;
 import com.javadevs.testingservice.model.QuestionType;
-import com.javadevs.testingservice.model.Subject;
-import jakarta.persistence.*;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.Set;
 
 @Getter
 @Setter
@@ -25,7 +22,7 @@ public class CreateQuestionCommand {
     private String correctAnswer;
     @Positive(message = "SUBJECT_ID_NOT_NEGATIVE")
     private Long subjectId;
-    @NotEmpty(message = "QUESTION_TYPE_NOT_EMPTY")
+    @Enumerated(EnumType.STRING)
     private QuestionType questionType;
 
 }

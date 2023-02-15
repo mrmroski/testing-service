@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @ToString(exclude = {"subjectsCovered"})
 @EqualsAndHashCode(exclude = {"subjectsCovered"})
@@ -30,5 +31,5 @@ public class Student {
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "student_subject", joinColumns = @JoinColumn(name = "student_id"),
             inverseJoinColumns = @JoinColumn(name = "subject_id"))
-    private List<Subject> subjectsCovered;
+    private Set<Subject> subjectsCovered;
 }
