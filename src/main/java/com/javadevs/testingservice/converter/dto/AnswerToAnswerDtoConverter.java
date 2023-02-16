@@ -15,6 +15,7 @@ public class AnswerToAnswerDtoConverter implements Converter<Answer, AnswerDto> 
                 .answer(answer.getAnswer())
                 .id(answer.getId())
                 .questionId(answer.getQuestion().getId())
+                .version(answer.getVersion())
                 .build();
     }
 }

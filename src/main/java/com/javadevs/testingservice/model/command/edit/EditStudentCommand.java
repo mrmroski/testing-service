@@ -1,22 +1,21 @@
-package com.javadevs.testingservice.model.dto;
+package com.javadevs.testingservice.model.command.edit;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
-@Data
-@Builder
+
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StudentDto {
+public class EditStudentCommand {
 
-    private long id;
     private String name;
     private String lastname;
     private String email;
     private LocalDate startedAt;
-    private long version;
-
+    private Long version;
 }

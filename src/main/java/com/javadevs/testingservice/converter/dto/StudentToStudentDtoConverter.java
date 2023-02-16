@@ -17,6 +17,7 @@ public class StudentToStudentDtoConverter implements Converter<Student, StudentD
                 .name(student.getName())
                 .lastname(student.getLastname())
                 .startedAt(student.getStartedAt())
+                .version(student.getVersion())
                 .build();
     }
 }

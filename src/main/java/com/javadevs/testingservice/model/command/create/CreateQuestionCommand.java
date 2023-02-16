@@ -1,4 +1,4 @@
-package com.javadevs.testingservice.model.command;
+package com.javadevs.testingservice.model.command.create;
 
 import com.javadevs.testingservice.model.QuestionType;
 import jakarta.persistence.EnumType;

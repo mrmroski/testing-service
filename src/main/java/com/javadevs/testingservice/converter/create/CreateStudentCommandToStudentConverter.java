@@ -1,7 +1,7 @@
 package com.javadevs.testingservice.converter.create;
 
 import com.javadevs.testingservice.model.Student;
-import com.javadevs.testingservice.model.command.CreateStudentCommand;
+import com.javadevs.testingservice.model.command.create.CreateStudentCommand;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.Converter;
 import org.modelmapper.spi.MappingContext;

@@ -22,4 +22,5 @@ public class QuestionDto {
     private String correctAnswer;
     private String subject;
     private QuestionType questionType;
+    private long version;
 }

@@ -1,7 +1,8 @@
 package com.javadevs.testingservice.controller;
 
 import com.javadevs.testingservice.model.Question;
-import com.javadevs.testingservice.model.command.CreateQuestionCommand;
+import com.javadevs.testingservice.model.command.create.CreateQuestionCommand;
+import com.javadevs.testingservice.model.command.edit.EditQuestionCommand;
 import com.javadevs.testingservice.model.dto.QuestionDto;
 import com.javadevs.testingservice.service.QuestionService;
 import jakarta.validation.Valid;
@@ -49,5 +50,12 @@ public class QuestionController {
         log.info("deleteQuestionById({})", questionId);
         questionService.deleteQuestion(questionId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/{questionId}")
+    public ResponseEntity editQuestionPartially(@PathVariable("questionId") long questionId, @RequestBody EditQuestionCommand command) {
+        log.info("editQuestionPartially({}, {})", questionId, command);
+        Question question = questionService.editQuestionPartially(questionId, command);
+        return new ResponseEntity(modelMapper.map(question, QuestionDto.class), HttpStatus.OK);
     }
 }

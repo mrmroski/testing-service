@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet author="patryk" id="patryk_01">
+
+        <insert tableName="students">
+            <column name="student_id" value="1"/>
+            <column name="name" value="Anna"/>
+            <column name="lastname" value="Lewandowska"/>
+            <column name="email" value="anka@o2.pl"/>
+            <column name="started_At" value="2020-05-23"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="students">
+            <column name="student_id" value="2"/>
+            <column name="name" value="Adam"/>
+            <column name="lastname" value="Malysz"/>
+            <column name="email" value="adam@o2.pl"/>
+            <column name="started_At" value="2022-06-23"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="students">
+            <column name="student_id" value="3"/>
+            <column name="name" value="Wojtek"/>
+            <column name="lastname" value="Gola"/>
+            <column name="email" value="wogol@o2.pl"/>
+            <column name="started_At" value="2021-11-15"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="students">
+            <column name="student_id" value="4"/>
+            <column name="name" value="Andrew"/>
+            <column name="lastname" value="Dunda"/>
+            <column name="email" value="andrew@o2.pl"/>
+            <column name="started_At" value="2022-12-12"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="students">
+            <column name="student_id" value="5"/>
+            <column name="name" value="Waldemar"/>
+            <column name="lastname" value="Kasta"/>
+            <column name="email" value="wakasta@o2.pl"/>
+            <column name="started_At" value="2019-05-15"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="subjects">
+            <column name="subject_id" value="1"/>
+            <column name="subject" value="Petle"/>
+            <column name="description" value="wprowadzenie do petli"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="subjects">
+            <column name="subject_id" value="2"/>
+            <column name="subject" value="Klasy"/>
+            <column name="description" value="wprowadzenie do klas"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="subjects">
+            <column name="subject_id" value="3"/>
+            <column name="subject" value="UML"/>
+            <column name="description" value="zaawansowany temat UML"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="subjects">
+            <column name="subject_id" value="4"/>
+            <column name="subject" value="Wyjatki"/>
+            <column name="description" value="tworzenie wlasnych wyjatkow"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="subjects">
+            <column name="subject_id" value="5"/>
+            <column name="subject" value="dziedziczenie"/>
+            <column name="description" value="dziedziczenie - teoria"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="questions">
+            <column name="question_id" value="1"/>
+            <column name="question" value="Q1?"/>
+            <column name="correct_Answer" value="A4"/>
+            <column name="question_Type" value="MULTIPLE_CHOICE"/>
+            <column name="subject_Id" value="1"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="questions">
+            <column name="question_id" value="2"/>
+            <column name="question" value="Q2?"/>
+            <column name="correct_Answer" value="A3"/>
+            <column name="question_Type" value="MULTIPLE_CHOICE"/>
+            <column name="subject_Id" value="2"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="questions">
+            <column name="question_id" value="3"/>
+            <column name="question" value="Q3?"/>
+            <column name="correct_Answer" value="A1"/>
+            <column name="question_Type" value="MULTIPLE_CHOICE"/>
+            <column name="subject_Id" value="3"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="questions">
+            <column name="question_id" value="4"/>
+            <column name="question" value="Q4?"/>
+            <column name="correct_Answer" value="A4"/>
+            <column name="question_Type" value="MULTIPLE_CHOICE"/>
+            <column name="subject_Id" value="4"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="questions">
+            <column name="question_id" value="5"/>
+            <column name="question" value="Q5?"/>
+            <column name="correct_Answer" value="A1"/>
+            <column name="question_Type" value="MULTIPLE_CHOICE"/>
+            <column name="subject_Id" value="4"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="answers">
+            <column name="answer_id" value="1"/>
+            <column name="answer" value="A1"/>
+            <column name="question_id" value="1"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="answers">
+            <column name="answer_id" value="2"/>
+            <column name="answer" value="A2"/>
+            <column name="question_id" value="1"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="answers">
+            <column name="answer_id" value="3"/>
+            <column name="answer" value="A3"/>
+            <column name="question_id" value="1"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="answers">
+            <column name="answer_id" value="4"/>
+            <column name="answer" value="A4"/>
+            <column name="question_id" value="1"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="answers">
+            <column name="answer_id" value="5"/>
+            <column name="answer" value="A1"/>
+            <column name="question_id" value="2"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="answers">
+            <column name="answer_id" value="6"/>
+            <column name="answer" value="A2"/>
+            <column name="question_id" value="2"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="answers">
+            <column name="answer_id" value="7"/>
+            <column name="answer" value="A3"/>
+            <column name="question_id" value="2"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="answers">
+            <column name="answer_id" value="8"/>
+            <column name="answer" value="A4"/>
+            <column name="question_id" value="2"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="answers">
+            <column name="answer_id" value="9"/>
+            <column name="answer" value="A1"/>
+            <column name="question_id" value="3"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="answers">
+            <column name="answer_id" value="10"/>
+            <column name="answer" value="A2"/>
+            <column name="question_id" value="3"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="answers">
+            <column name="answer_id" value="11"/>
+            <column name="answer" value="A3"/>
+            <column name="question_id" value="3"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="answers">
+            <column name="answer_id" value="12"/>
+            <column name="answer" value="A4"/>
+            <column name="question_id" value="3"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="answers">
+            <column name="answer_id" value="13"/>
+            <column name="answer" value="A1"/>
+            <column name="question_id" value="4"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="answers">
+            <column name="answer_id" value="14"/>
+            <column name="answer" value="A2"/>
+            <column name="question_id" value="4"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="answers">
+            <column name="answer_id" value="15"/>
+            <column name="answer" value="A3"/>
+            <column name="question_id" value="4"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+        <insert tableName="answers">
+            <column name="answer_id" value="16"/>
+            <column name="answer" value="A4"/>
+            <column name="question_id" value="4"/>
+            <column name="deleted" value="false"/>
+            <column name="version" value="0"/>
+        </insert>
+
+    </changeSet>
+
+</databaseChangeLog>

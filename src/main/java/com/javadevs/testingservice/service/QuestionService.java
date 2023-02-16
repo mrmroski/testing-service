@@ -1,15 +1,19 @@
 package com.javadevs.testingservice.service;
 
+import com.javadevs.testingservice.model.Answer;
 import com.javadevs.testingservice.model.Question;
 import com.javadevs.testingservice.model.Subject;
-import com.javadevs.testingservice.model.command.CreateQuestionCommand;
+import com.javadevs.testingservice.model.command.create.CreateQuestionCommand;
+import com.javadevs.testingservice.model.command.edit.EditAnswerCommand;
+import com.javadevs.testingservice.model.command.edit.EditQuestionCommand;
 import com.javadevs.testingservice.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static java.util.Optional.ofNullable;
 
 @Service
 @RequiredArgsConstructor
@@ -50,5 +54,29 @@ public class QuestionService {
         } else {
             throw new RuntimeException(String.format("Question with id %s not found!", id));
         }
+    }
+
+    @Transactional
+    public Question editQuestionPartially(long id, EditQuestionCommand command) {
+        Subject subjectToReplace = null;
+
+        if (command.getSubjectId() != null) {
+            subjectToReplace = subjectService.findSubjectById(command.getSubjectId());
+        }
+
+        Subject finalSubjectToReplace = subjectToReplace;
+        Question question = questionRepository.findById(id)
+                .map(questionToEdit -> {
+                    ofNullable(command.getCorrectAnswer()).ifPresent(questionToEdit::setCorrectAnswer);
+                    ofNullable(command.getQuestionType()).ifPresent(questionToEdit::setQuestionType);
+                    ofNullable(command.getQuestion()).ifPresent(questionToEdit::setQuestion);
+                    ofNullable(command.getVersion()).ifPresent(questionToEdit::setVersion);
+                    ofNullable(finalSubjectToReplace).ifPresent(questionToEdit::setSubject);
+
+                    return questionToEdit;
+                }).orElseThrow(()
+                        -> new RuntimeException(String.format("Question with id %s not found!", id)));
+
+        return questionRepository.saveAndFlush(question);
     }
 }

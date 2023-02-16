@@ -1,7 +1,11 @@
 package com.javadevs.testingservice.controller;
 
+import com.javadevs.testingservice.model.Question;
 import com.javadevs.testingservice.model.Subject;
-import com.javadevs.testingservice.model.command.CreateSubjectCommand;
+import com.javadevs.testingservice.model.command.create.CreateSubjectCommand;
+import com.javadevs.testingservice.model.command.edit.EditQuestionCommand;
+import com.javadevs.testingservice.model.command.edit.EditSubjectCommand;
+import com.javadevs.testingservice.model.dto.QuestionDto;
 import com.javadevs.testingservice.model.dto.SubjectDto;
 import com.javadevs.testingservice.service.SubjectService;
 import jakarta.validation.Valid;
@@ -49,5 +53,12 @@ public class SubjectController {
         log.info("deleteSubjectById({})", subjectId);
         subjectService.deleteSubject(subjectId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/{subjectId}")
+    public ResponseEntity editSubjectPartially(@PathVariable("subjectId") long subjectId, @RequestBody EditSubjectCommand command) {
+        log.info("editSubjectPartially({}, {})", subjectId, command);
+        Subject subject = subjectService.editSubjectPartially(subjectId, command);
+        return new ResponseEntity(modelMapper.map(subject, SubjectDto.class), HttpStatus.OK);
     }
 }

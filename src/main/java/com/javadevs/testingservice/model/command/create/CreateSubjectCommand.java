@@ -1,4 +1,4 @@
-package com.javadevs.testingservice.model.command;
+package com.javadevs.testingservice.model.command.create;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;

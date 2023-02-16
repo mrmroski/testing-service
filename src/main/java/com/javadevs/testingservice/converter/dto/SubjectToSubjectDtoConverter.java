@@ -14,6 +14,8 @@ public class SubjectToSubjectDtoConverter implements Converter<Subject, SubjectD
         return SubjectDto.builder()
                 .id(subject.getId())
                 .description(subject.getDescription())
+                .version(subject.getVersion())
+                .subject(subject.getSubject())
                 .build();
     }
 }
