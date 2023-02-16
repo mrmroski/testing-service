@@ -22,14 +22,32 @@ public class Question {
     @Column(name = "question_id")
     private long id;
     private String question;
-    private String correctAnswer;
     private QuestionType questionType;
 
-    @OneToMany(mappedBy = "question", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "question", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private Set<Answer> answers;
 
     @ManyToOne
-    @JoinColumn(name = "subject_id", referencedColumnName = "subject_id", foreignKey = @ForeignKey(name = "subject_question_fk"))
+    @JoinColumn(name = "subject_id")
     private Subject subject;
 
+    public void addAnswer(Answer other) {
+        boolean noneIdMatch = this.answers.stream()
+                .noneMatch(curr -> curr.getId() == other.getId());
+        if (noneIdMatch) {
+            this.answers.add(other);
+        } else {
+            throw new RuntimeException("Answer with id " + other.getId() + " is already added!");
+        }
+    }
+
+    public void deleteAnswer(Long answerId) {
+        Answer toDelete = this.answers.stream()
+                .filter(curr -> curr.getId() == answerId)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Answer with id " + answerId + " wasn't added!"));
+        System.out.println(toDelete);
+        this.answers.remove(toDelete);
+        System.out.println(this.answers);
+    }
 }

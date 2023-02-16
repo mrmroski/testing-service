@@ -19,7 +19,7 @@ public class QuestionDto {
 
     private long id;
     private String question;
-    private String correctAnswer;
-    private String subject;
+    private SubjectDto subject;
     private QuestionType questionType;
+    private Set<AnswerDto> answers;
 }

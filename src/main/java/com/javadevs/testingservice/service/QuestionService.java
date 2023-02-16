@@ -1,8 +1,12 @@
 package com.javadevs.testingservice.service;
 
+import com.javadevs.testingservice.model.Answer;
 import com.javadevs.testingservice.model.Question;
 import com.javadevs.testingservice.model.Subject;
-import com.javadevs.testingservice.model.command.CreateQuestionCommand;
+import com.javadevs.testingservice.model.command.create.CreateQuestionCommand;
+import com.javadevs.testingservice.model.command.edit.EditQuestionCommand;
+import com.javadevs.testingservice.model.command.questionEdit.AddAnswerCommand;
+import com.javadevs.testingservice.model.command.questionEdit.DeleteAnswerCommand;
 import com.javadevs.testingservice.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -11,25 +15,39 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class QuestionService {
 
     private final QuestionRepository questionRepository;
     private final SubjectService subjectService;
+    private final ModelMapper mapper;
 
     @Transactional
     public Question saveQuestion(CreateQuestionCommand command) {
         Subject subject = subjectService.findSubjectById(command.getSubjectId());
 
-        Question question = Question.builder()
-                .subject(subject)
-                .correctAnswer(command.getCorrectAnswer())
-                .question(command.getQuestion())
-                .questionType(command.getQuestionType())
-                .build();
+        Question q = new Question();
+        q.setQuestion(command.getQuestion());
+        q.setQuestionType(command.getQuestionType());
+        q.setSubject(subject);
 
-        return questionRepository.save(question);
+        Set<Answer> answers = command.getAnswers().stream()
+                        .map(cmd -> {
+                            Answer ans = new Answer();
+                            ans.setAnswer(cmd.getAnswer());
+                            ans.setCorrect(cmd.getCorrect());
+                            ans.setQuestion(q);
+                            return ans;
+                        })
+                        .collect(Collectors.toSet());
+        q.setAnswers(answers);
+
+        return questionRepository.save(q);
     }
 
     @Transactional(readOnly = true)
@@ -38,9 +56,10 @@ public class QuestionService {
                 .orElseThrow(() -> new RuntimeException((String.format("Question with id %s not found!", id))));
     }
 
+    //TODO: in memory problem (widok)
     @Transactional(readOnly = true)
     public Page<Question> findAllQuestions(Pageable pageable) {
-        return questionRepository.findAll(pageable);
+        return questionRepository.findAllWithAnswers(pageable);
     }
 
     @Transactional
@@ -50,5 +69,52 @@ public class QuestionService {
         } else {
             throw new RuntimeException(String.format("Question with id %s not found!", id));
         }
+    }
+
+    @Transactional
+    public Question editQuestion(long id, EditQuestionCommand cmd) {
+        Question s =  questionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException((String.format("Question with id %s not found!", id))));
+        Subject sub = subjectService.findSubjectById(cmd.getSubjectId());
+
+        s.setQuestion(cmd.getQuestion());
+        s.setQuestionType(cmd.getQuestionType());
+        s.setSubject(sub);
+        return s;
+    }
+
+    @Transactional
+    public Question editQuestionPartially(long id, EditQuestionCommand cmd) {
+        Question s =  questionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException((String.format("Question with id %s not found!", id))));
+
+        Optional.ofNullable(cmd.getSubjectId()).ifPresent(x -> {
+            Subject sub = subjectService.findSubjectById(x);
+            s.setSubject(sub);
+        });
+        Optional.ofNullable(cmd.getQuestion()).ifPresent(s::setQuestion);
+        Optional.ofNullable(cmd.getQuestionType()).ifPresent(s::setQuestionType);
+        return s;
+    }
+
+    @Transactional
+    public void addAnswer(AddAnswerCommand cmd) {
+        Question s =  questionRepository.findById(cmd.getQuestionId())
+                .orElseThrow(() -> new RuntimeException((String.format("Question with id %s not found!", cmd.getQuestionId()))));
+
+        Answer ans = new Answer();
+        ans.setQuestion(s);
+        ans.setAnswer(cmd.getAnswer());
+        ans.setCorrect(cmd.getCorrect());
+
+        s.addAnswer(ans);
+    }
+
+    @Transactional
+    public void deleteAnswer(DeleteAnswerCommand cmd) {
+        Question s =  questionRepository.findById(cmd.getQuestionId())
+                .orElseThrow(() -> new RuntimeException((String.format("Question with id %s not found!", cmd.getQuestionId()))));
+
+        s.deleteAnswer(cmd.getAnswerId());
     }
 }

@@ -1,13 +1,14 @@
 package com.javadevs.testingservice.controller;
 
-import com.javadevs.testingservice.model.Subject;
-import com.javadevs.testingservice.model.command.CreateSubjectCommand;
+import com.javadevs.testingservice.model.command.create.CreateSubjectCommand;
+import com.javadevs.testingservice.model.command.edit.EditSubjectCommand;
 import com.javadevs.testingservice.model.dto.SubjectDto;
 import com.javadevs.testingservice.service.SubjectService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -24,30 +25,59 @@ public class SubjectController {
     private final ModelMapper modelMapper;
 
     @PostMapping
-    public ResponseEntity<Subject> saveSubject(@RequestBody @Valid CreateSubjectCommand command) {
+    public ResponseEntity<SubjectDto> saveSubject(@RequestBody @Valid CreateSubjectCommand command) {
         log.info("saveSubject{}", command);
-        return new ResponseEntity(modelMapper
+
+        return new ResponseEntity<>(modelMapper
                 .map(subjectService.saveSubject(command), SubjectDto.class), HttpStatus.CREATED);
     }
 
     @GetMapping("/{subjectId}")
-    public ResponseEntity findSubjectById(@PathVariable("subjectId") long subjectId) {
+    public ResponseEntity<SubjectDto> findSubjectById(@PathVariable("subjectId") long subjectId) {
         log.info("findSubjectById({})", subjectId);
-        return new ResponseEntity(modelMapper
+
+        return new ResponseEntity<>(modelMapper
                 .map(subjectService.findSubjectById(subjectId),SubjectDto.class), HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity findAllSubjects(@PageableDefault Pageable pageable) {
+    public ResponseEntity<Page<SubjectDto>> findAllSubjects(@PageableDefault Pageable pageable) {
         log.info("findAllSubjects()");
-        return new ResponseEntity(subjectService.findAllSubjects(pageable)
+
+        return new ResponseEntity<>(subjectService.findAllSubjects(pageable)
                 .map(subject -> modelMapper.map(subject, SubjectDto.class)), HttpStatus.OK);
     }
 
     @DeleteMapping("/{subjectId}")
-    public ResponseEntity deleteSubjectById(@PathVariable("subjectId") long subjectId) {
+    public ResponseEntity<?> deleteSubjectById(@PathVariable("subjectId") long subjectId) {
         log.info("deleteSubjectById({})", subjectId);
+
         subjectService.deleteSubject(subjectId);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/{subjectId}")
+    public ResponseEntity<SubjectDto> editSubject(@PathVariable("subjectId") long subjectId,
+                                                  @RequestBody @Valid EditSubjectCommand cmd
+    ) {
+        log.info("editSubject({})", subjectId);
+
+        return new ResponseEntity<>(modelMapper
+                .map(subjectService.editSubject(subjectId, cmd), SubjectDto.class),
+                HttpStatus.OK
+        );
+    }
+
+    //bez @valid zeby mogly byc nulle w commandzie
+    @PatchMapping("/{subjectId}")
+    public ResponseEntity<SubjectDto> editSubjectPartially(@PathVariable("subjectId") long subjectId,
+                                                           @RequestBody EditSubjectCommand cmd
+    ) {
+        log.info("editPartiallySubject({})", subjectId);
+
+        return new ResponseEntity<>(modelMapper
+                .map(subjectService.editSubjectPartially(subjectId, cmd), SubjectDto.class),
+                HttpStatus.OK
+        );
     }
 }

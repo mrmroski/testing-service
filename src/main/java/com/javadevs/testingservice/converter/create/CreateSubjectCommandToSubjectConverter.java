@@ -1,7 +1,7 @@
 package com.javadevs.testingservice.converter.create;
 
 import com.javadevs.testingservice.model.Subject;
-import com.javadevs.testingservice.model.command.CreateSubjectCommand;
+import com.javadevs.testingservice.model.command.create.CreateSubjectCommand;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.Converter;
 import org.modelmapper.spi.MappingContext;
