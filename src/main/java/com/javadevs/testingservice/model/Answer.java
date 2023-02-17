@@ -21,6 +21,7 @@ public class Answer {
     @Column(name = "answer_id")
     private long id;
     private String answer;
+    private Boolean correct;
 
     @ManyToOne
     @JoinColumn(name = "question_id", referencedColumnName = "question_id", foreignKey = @ForeignKey(name = "question_answer_fk"))

@@ -1,13 +1,17 @@
 package com.javadevs.testingservice.controller;
 
-import com.javadevs.testingservice.model.Student;
-import com.javadevs.testingservice.model.command.CreateStudentCommand;
+import com.javadevs.testingservice.model.command.studentEdit.AddSubjectCoveredToStudentCommand;
+import com.javadevs.testingservice.model.command.create.CreateStudentCommand;
+import com.javadevs.testingservice.model.command.studentEdit.AssignQuestionToStudentCommand;
+import com.javadevs.testingservice.model.command.studentEdit.DeleteSubjectCoveredFromStudentCommand;
+import com.javadevs.testingservice.model.command.studentEdit.UnassignQuestionFromStudentCommand;
 import com.javadevs.testingservice.model.dto.StudentDto;
 import com.javadevs.testingservice.service.StudentService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -21,33 +25,79 @@ import org.springframework.web.bind.annotation.*;
 public class StudentController {
 
     private final StudentService studentService;
-    private final ModelMapper modelMappper;
+    private final ModelMapper modelMapper;
 
     @PostMapping
-    public ResponseEntity<Student> saveStudent(@RequestBody @Valid CreateStudentCommand command) {
+    public ResponseEntity<StudentDto> saveStudent(@RequestBody @Valid CreateStudentCommand command) {
         log.info("saveStudent({})", command);
-        return new ResponseEntity(modelMappper
-                .map(studentService.saveStudent(command), StudentDto.class), HttpStatus.CREATED);
+
+        return new ResponseEntity<>(modelMapper
+                .map(studentService.saveStudent(command), StudentDto.class),
+                HttpStatus.CREATED
+        );
     }
 
     @GetMapping("/{studentId}")
-    public ResponseEntity findStudentById(@PathVariable("studentId") long studentId) {
+    public ResponseEntity<StudentDto> findStudentById(@PathVariable("studentId") long studentId) {
         log.info("findStudentById({})", studentId);
-        return new ResponseEntity(modelMappper
-                .map(studentService.findStudentById(studentId),StudentDto.class), HttpStatus.OK);
+
+        return new ResponseEntity<>(modelMapper
+                .map(studentService.findStudentById(studentId),StudentDto.class),
+                HttpStatus.OK
+        );
     }
 
     @GetMapping
-    public ResponseEntity findAllStudents(@PageableDefault Pageable pageable) {
+    public ResponseEntity<Page<StudentDto>> findAllStudents(@PageableDefault Pageable pageable) {
         log.info("findAllStudents()");
-        return new ResponseEntity(studentService.findAllStudents(pageable)
-                .map(student -> modelMappper.map(student, StudentDto.class)), HttpStatus.OK);
+
+        return new ResponseEntity<>(studentService.findAllStudents(pageable)
+                .map(student -> modelMapper.map(student, StudentDto.class)),
+                HttpStatus.OK
+        );
     }
 
     @DeleteMapping("/{studentId}")
-    public ResponseEntity deleteStudentById(@PathVariable("studentId") long studentId) {
+    public ResponseEntity<?> deleteStudentById(@PathVariable("studentId") long studentId) {
         log.info("deleteStudentById({})", studentId);
+
         studentService.deleteStudent(studentId);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @PatchMapping("/{studentId}/addSubject")
+    public ResponseEntity<?> addSubjectCovered(@PathVariable("studentId") long id,
+                                               @RequestBody @Valid AddSubjectCoveredToStudentCommand cmd) {
+        log.info("addSubjectCovered({})", id);
+
+        studentService.addSubjectCovered(cmd);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+//    @PatchMapping("/{studentId}/assignQuestion")
+//    public ResponseEntity<?> assignQuestion(@PathVariable("studentId") long id,
+//                                               @RequestBody @Valid AssignQuestionToStudentCommand cmd) {
+//        log.info("assignQuestion({})", id);
+//
+//        studentService.assignQuestion(cmd);
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
+
+    @PatchMapping("/{studentId}/deleteSubject")
+    public ResponseEntity<?> deleteSubject(@PathVariable("studentId") long id,
+                                               @RequestBody @Valid DeleteSubjectCoveredFromStudentCommand cmd) {
+        log.info("deleteSubject({})", id);
+
+        studentService.deleteSubjectCovered(cmd);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+//    @PatchMapping("/{studentId}/unassignQuestion")
+//    public ResponseEntity<?> unassignQuestion(@PathVariable("studentId") long id,
+//                                               @RequestBody @Valid UnassignQuestionFromStudentCommand cmd) {
+//        log.info("unassignQuestion({})", id);
+//
+//        studentService.unassignQuestion(cmd);
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
 }

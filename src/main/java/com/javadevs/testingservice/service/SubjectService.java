@@ -1,7 +1,10 @@
 package com.javadevs.testingservice.service;
 
+import com.javadevs.testingservice.model.Student;
 import com.javadevs.testingservice.model.Subject;
-import com.javadevs.testingservice.model.command.CreateSubjectCommand;
+import com.javadevs.testingservice.model.command.create.CreateSubjectCommand;
+import com.javadevs.testingservice.model.command.edit.EditSubjectCommand;
+import com.javadevs.testingservice.repository.StudentRepository;
 import com.javadevs.testingservice.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -10,11 +13,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class SubjectService {
 
     private final SubjectRepository subjectRepository;
+    private final StudentRepository studentRepository;
     private final ModelMapper modelMapper;
 
     @Transactional
@@ -35,13 +42,34 @@ public class SubjectService {
     }
 
     @Transactional
+    //TODO ida 3 sqle do bazy
     public void deleteSubject(long id) {
         if (subjectRepository.existsById(id)) {
+            List<Student> students = studentRepository.findBySubjectId(id);
+            students.forEach(x -> x.getSubjectsCovered().removeIf(s -> s.getId() == id));
             subjectRepository.deleteById(id);
         } else {
             throw new RuntimeException(String.format("Subject with id %s not found!", id));
         }
     }
 
+    @Transactional
+    public Subject editSubject(long id, EditSubjectCommand cmd) {
+        Subject s =  subjectRepository.findSubjectById(id)
+                .orElseThrow(() -> new RuntimeException((String.format("Subject with id %s not found!", id))));
 
+        s.setSubject(cmd.getSubject());
+        s.setDescription(cmd.getDescription());
+        return s;
+    }
+
+    @Transactional
+    public Subject editSubjectPartially(long id, EditSubjectCommand cmd) {
+        Subject s =  subjectRepository.findSubjectById(id)
+                .orElseThrow(() -> new RuntimeException((String.format("Subject with id %s not found!", id))));
+
+        Optional.ofNullable(cmd.getSubject()).ifPresent(s::setSubject);
+        Optional.ofNullable(cmd.getDescription()).ifPresent(s::setDescription);
+        return s;
+    }
 }

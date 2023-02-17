@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -17,5 +20,5 @@ public class StudentDto {
     private String lastname;
     private String email;
     private LocalDate startedAt;
-
+    private Set<SubjectDto> subjects;
 }

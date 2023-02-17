@@ -14,7 +14,7 @@ public class AnswerToAnswerDtoConverter implements Converter<Answer, AnswerDto> 
         return AnswerDto.builder()
                 .answer(answer.getAnswer())
                 .id(answer.getId())
-                .questionId(answer.getQuestion().getId())
+                .correct(answer.getCorrect())
                 .build();
     }
 }
