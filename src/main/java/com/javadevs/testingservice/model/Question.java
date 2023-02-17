@@ -2,6 +2,8 @@ package com.javadevs.testingservice.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.util.Set;
 
@@ -13,6 +15,8 @@ import java.util.Set;
 @Entity(name = "Question")
 @Table(name = "questions")
 @Builder
+@SQLDelete(sql = "UPDATE questions SET deleted = true WHERE question_id=? AND version=?")
+@Where(clause = "deleted=false")
 public class Question {
 
     @Id
@@ -23,6 +27,9 @@ public class Question {
     private long id;
     private String question;
     private QuestionType questionType;
+    private boolean deleted;
+    @Version
+    private long version;
 
     @OneToMany(mappedBy = "question", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private Set<Answer> answers;

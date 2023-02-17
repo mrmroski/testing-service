@@ -1,13 +1,11 @@
 package com.javadevs.testingservice.service;
 
-import com.javadevs.testingservice.model.Question;
 import com.javadevs.testingservice.model.Student;
 import com.javadevs.testingservice.model.Subject;
-import com.javadevs.testingservice.model.command.studentEdit.AddSubjectCoveredToStudentCommand;
-import com.javadevs.testingservice.model.command.studentEdit.AssignQuestionToStudentCommand;
 import com.javadevs.testingservice.model.command.create.CreateStudentCommand;
+import com.javadevs.testingservice.model.command.edit.EditStudentCommand;
+import com.javadevs.testingservice.model.command.studentEdit.AddSubjectCoveredToStudentCommand;
 import com.javadevs.testingservice.model.command.studentEdit.DeleteSubjectCoveredFromStudentCommand;
-import com.javadevs.testingservice.model.command.studentEdit.UnassignQuestionFromStudentCommand;
 import com.javadevs.testingservice.repository.QuestionRepository;
 import com.javadevs.testingservice.repository.StudentRepository;
 import com.javadevs.testingservice.repository.SubjectRepository;
@@ -17,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static java.util.Optional.ofNullable;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +35,7 @@ public class StudentService {
 
     @Transactional(readOnly = true)
     public Student findStudentById(long id) {
-        return studentRepository.findById(id)
+        return studentRepository.findByIdWithSubjects(id)
                 .orElseThrow(() -> new RuntimeException((String.format("Student with id %s not found!", id))));
     }
 
@@ -51,6 +51,20 @@ public class StudentService {
         } else {
             throw new RuntimeException(String.format("Student with id %s not found!", id));
         }
+    }
+
+    public Student editStudentPartially(long id, EditStudentCommand command) {
+
+        Student student = studentRepository.findByIdWithSubjects(id).orElseThrow(()
+                -> new RuntimeException(String.format("Student with id %s not found!", id)));
+
+        ofNullable(command.getName()).ifPresent(student::setName);
+        ofNullable(command.getLastname()).ifPresent(student::setLastname);
+        ofNullable(command.getStartedAt()).ifPresent(student::setStartedAt);
+        ofNullable(command.getEmail()).ifPresent(student::setEmail);
+        ofNullable(command.getVersion()).ifPresent(student::setVersion);
+
+        return studentRepository.saveAndFlush(student);
     }
 
     @Transactional

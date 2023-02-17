@@ -21,4 +21,5 @@ public class StudentDto {
     private String email;
     private LocalDate startedAt;
     private Set<SubjectDto> subjects;
+    private long version;
 }

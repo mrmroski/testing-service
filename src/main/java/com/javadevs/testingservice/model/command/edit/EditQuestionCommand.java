@@ -25,4 +25,5 @@ public class EditQuestionCommand {
     private Long subjectId;
     @Enumerated(EnumType.STRING)
     private QuestionType questionType;
+    private Long version;
 }

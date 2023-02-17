@@ -22,4 +22,5 @@ public class QuestionDto {
     private SubjectDto subject;
     private QuestionType questionType;
     private Set<AnswerDto> answers;
+    private long version;
 }

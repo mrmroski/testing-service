@@ -16,4 +16,5 @@ public class EditSubjectCommand {
     private String subject;
     @NotEmpty(message = "DESCRIPTION_NOT_EMPTY")
     private String description;
+    private Long version;
 }

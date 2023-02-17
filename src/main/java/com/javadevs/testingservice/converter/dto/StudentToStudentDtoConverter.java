@@ -37,6 +37,7 @@ public class StudentToStudentDtoConverter implements Converter<Student, StudentD
                                     .build();
                             return dto;
                         }).collect(Collectors.toSet()))
+                .version(student.getVersion())
                 .build();
     }
 }
