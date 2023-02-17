@@ -120,4 +120,9 @@ public class QuestionService {
         s.deleteAnswer(cmd.getAnswerId());
         answerRepository.deleteById(cmd.getAnswerId());
     }
+
+    @Transactional(readOnly = true)
+    public Set<Question> findQuestionsByIds(Set<Long> ids) {
+        return questionRepository.findQuestionsByIds(ids);
+    }
 }

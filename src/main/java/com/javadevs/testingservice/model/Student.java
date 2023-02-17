@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @ToString(exclude = {"subjectsCovered"})
@@ -34,10 +32,8 @@ public class Student {
             inverseJoinColumns = @JoinColumn(name = "subject_id"))
     private Set<Subject> subjectsCovered;
 
-//    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-//    @JoinTable(name = "student_questions", joinColumns = @JoinColumn(name = "student_id"),
-//            inverseJoinColumns = @JoinColumn(name = "question_id"))
-//    private Set<Question> questions;
+    @OneToMany(mappedBy = "student", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Set<Exam> exams;
 
     public void addSubject(Subject other) {
         boolean noneIdMatch = this.subjectsCovered.stream()
@@ -49,16 +45,6 @@ public class Student {
         }
     }
 
-//    public void assignQuestion(Question other) {
-//        boolean noneIdMatch = this.questions.stream()
-//                .noneMatch(curr -> curr.getId() == other.getId());
-//        if (noneIdMatch) {
-//            this.questions.add(other);
-//        } else {
-//            throw new RuntimeException("Question with id " + other.getId() + " is already assigned!");
-//        }
-//    }
-
     public void deleteSubject(Subject other) {
         Subject toDelete = this.subjectsCovered.stream()
                 .filter(curr -> curr.getId() == other.getId())
@@ -67,11 +53,21 @@ public class Student {
         this.subjectsCovered.remove(toDelete);
     }
 
-//    public void unassignQuestion(Question other) {
-//        Question toDelete = this.questions.stream()
-//                .filter(curr -> curr.getId() == other.getId())
-//                .findFirst()
-//                .orElseThrow(() -> new RuntimeException("Question with id " + other.getId() + " wasn't assigned!"));
-//        this.questions.remove(toDelete);
-//    }
+    public void assignExam(Exam exam) {
+        if (!exams.contains(exam)) {
+            this.exams.add(exam);
+            exam.setStudent(this);
+        } else {
+            throw new RuntimeException("Exam with id " + exam.getId() + " is already assigned!");
+        }
+    }
+
+    public void removeExam(Exam exam) {
+        if (exams.contains(exam)) {
+            this.exams.remove(exam);
+            exam.setStudent(null);
+        } else {
+            throw new RuntimeException("Exam with id " + exam.getId() + " was not assigned to student with id " + this.getId());
+        }
+    }
 }
