@@ -46,8 +46,6 @@ public class Question {
                 .filter(curr -> curr.getId() == answerId)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Answer with id " + answerId + " wasn't added!"));
-        System.out.println(toDelete);
         this.answers.remove(toDelete);
-        System.out.println(this.answers);
     }
 }

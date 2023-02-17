@@ -7,6 +7,7 @@ import com.javadevs.testingservice.model.command.create.CreateQuestionCommand;
 import com.javadevs.testingservice.model.command.edit.EditQuestionCommand;
 import com.javadevs.testingservice.model.command.questionEdit.AddAnswerCommand;
 import com.javadevs.testingservice.model.command.questionEdit.DeleteAnswerCommand;
+import com.javadevs.testingservice.repository.AnswerRepository;
 import com.javadevs.testingservice.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class QuestionService {
 
     private final QuestionRepository questionRepository;
+    private final AnswerRepository answerRepository;
     private final SubjectService subjectService;
     private final ModelMapper mapper;
 
@@ -116,5 +118,6 @@ public class QuestionService {
                 .orElseThrow(() -> new RuntimeException((String.format("Question with id %s not found!", cmd.getQuestionId()))));
 
         s.deleteAnswer(cmd.getAnswerId());
+        answerRepository.deleteById(cmd.getAnswerId());
     }
 }
