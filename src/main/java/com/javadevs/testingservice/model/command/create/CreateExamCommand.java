@@ -1,6 +1,8 @@
 package com.javadevs.testingservice.model.command.create;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,10 +16,10 @@ import java.util.Set;
 @Builder
 public class CreateExamCommand {
 
-    @NotEmpty(message = "STUDENT_ID_NOT_EMPTY")
+    @Positive(message = "STUDENT_ID_NOT_NEGATIVE")
     private Long studentId;
     @NotEmpty(message = "DESCRIPTION_NOT_EMPTY")
     private String description;
-    @NotEmpty(message = "LIST_OF_QUESTIONS_NOT_EMPTY")
+    @NotNull(message = "LIST_OF_QUESTIONS_NOT_NULL")
     private Set<Long> questions;
 }

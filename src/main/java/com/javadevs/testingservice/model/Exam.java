@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -19,6 +21,8 @@ import java.util.Set;
 @Builder
 @SQLDelete(sql = "UPDATE exams SET deleted = true WHERE exam_id=? AND version=?")
 @Where(clause = "deleted=false")
+@ToString(exclude = {"student"})
+@EqualsAndHashCode(exclude = {"student"})
 public class Exam {
 
     @Id

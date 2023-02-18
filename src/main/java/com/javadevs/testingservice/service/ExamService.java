@@ -3,6 +3,7 @@ package com.javadevs.testingservice.service;
 import com.javadevs.testingservice.model.Exam;
 import com.javadevs.testingservice.model.Question;
 import com.javadevs.testingservice.model.Student;
+import com.javadevs.testingservice.model.Subject;
 import com.javadevs.testingservice.model.command.create.CreateExamCommand;
 import com.javadevs.testingservice.repository.ExamRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,20 @@ public class ExamService {
     public Exam saveExam(CreateExamCommand command) {
         Student student = studentService.findStudentById(command.getStudentId());
         Set<Question> questions = questionService.findQuestionsByIds(command.getQuestions());
+
+        for (Question q: questions) {
+            boolean found = false;
+            for (Subject s : student.getSubjectsCovered()) {
+                if (q.getSubject().getId() == s.getId()) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                throw new RuntimeException("student hasn't covered these subjects!");
+            }
+        }
 
         Exam exam = Exam.builder()
                 .createdAt(LocalDate.now())
