@@ -2,14 +2,11 @@ package com.javadevs.testingservice.service;
 
 import com.javadevs.testingservice.exception.StudentNotFoundException;
 import com.javadevs.testingservice.exception.SubjectNotFoundException;
-import com.javadevs.testingservice.model.Question;
 import com.javadevs.testingservice.model.Student;
 import com.javadevs.testingservice.model.Subject;
 import com.javadevs.testingservice.model.command.studentEdit.AddSubjectCoveredToStudentCommand;
-import com.javadevs.testingservice.model.command.studentEdit.AssignQuestionToStudentCommand;
 import com.javadevs.testingservice.model.command.create.CreateStudentCommand;
 import com.javadevs.testingservice.model.command.studentEdit.DeleteSubjectCoveredFromStudentCommand;
-import com.javadevs.testingservice.model.command.studentEdit.UnassignQuestionFromStudentCommand;
 import com.javadevs.testingservice.repository.QuestionRepository;
 import com.javadevs.testingservice.repository.StudentRepository;
 import com.javadevs.testingservice.repository.SubjectRepository;

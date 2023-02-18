@@ -1,6 +1,5 @@
 package com.javadevs.testingservice.controller;
 
-import com.javadevs.testingservice.model.Exam;
 import com.javadevs.testingservice.model.command.create.CreateExamCommand;
 import com.javadevs.testingservice.model.dto.ExamDto;
 import com.javadevs.testingservice.service.ExamService;

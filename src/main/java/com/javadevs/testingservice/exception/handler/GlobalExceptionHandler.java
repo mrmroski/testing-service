@@ -46,6 +46,22 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(new AnswerWasNotAddedResponseBody("ANSWER_WAS_NOT_ADDED", exc.getId()));
     }
 
+    @ExceptionHandler(ExamAlreadyAssignedException.class)
+    public ResponseEntity<ExamAlreadyAssignedResponseBody> handleExamAlreadyAssignedException(ExamAlreadyAssignedException exc) {
+        return ResponseEntity.badRequest().body(new ExamAlreadyAssignedResponseBody("EXAM_ALREADY_ASSIGNED_TO_STUDENT", exc.getId()));
+    }
+
+    @ExceptionHandler(ExamNotFoundException.class)
+    public ResponseEntity<ExamNotFoundResponseBody> handleExamNotFoundException(ExamNotFoundException exc) {
+        return ResponseEntity.badRequest().body(new ExamNotFoundResponseBody("EXAM_WITH_ID_NOT_FOUND", exc.getId()));
+    }
+
+    @ExceptionHandler(StudentSubjectsNotCoveredException.class)
+    public ResponseEntity<StudentSubjectNotCoveredResponseBody> handleStudentSubjectNotCoveredException(StudentSubjectsNotCoveredException exc) {
+        return ResponseEntity.badRequest().body(new StudentSubjectNotCoveredResponseBody("STUDENT_HAS_NOT_COVERED_SUBJECTS"));
+    }
+
+
 
     @Value
     static class QuestionNotFoundResponseBody {
@@ -87,6 +103,23 @@ public class GlobalExceptionHandler {
     static class AnswerWasNotAddedResponseBody {
         String code;
         long answerId;
+    }
+
+    @Value
+    static class ExamAlreadyAssignedResponseBody {
+        String code;
+        long answerId;
+    }
+
+    @Value
+    static class ExamNotFoundResponseBody {
+        String code;
+        long answerId;
+    }
+
+    @Value
+    static class StudentSubjectNotCoveredResponseBody {
+        String code;
     }
 
 }

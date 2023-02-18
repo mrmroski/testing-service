@@ -1,5 +1,7 @@
 package com.javadevs.testingservice.model;
 
+import com.javadevs.testingservice.exception.ExamAlreadyAssignedException;
+import com.javadevs.testingservice.exception.ExamNotFoundException;
 import com.javadevs.testingservice.exception.SubjectIsAlreadyCoveredException;
 import com.javadevs.testingservice.exception.SubjectWasNotCoveredException;
 import jakarta.persistence.*;
@@ -60,7 +62,7 @@ public class Student {
             this.exams.add(exam);
             exam.setStudent(this);
         } else {
-            throw new RuntimeException("Exam with id " + exam.getId() + " is already assigned!");
+            throw new ExamAlreadyAssignedException(exam.getId());
         }
     }
 
@@ -69,7 +71,7 @@ public class Student {
             this.exams.remove(exam);
             exam.setStudent(null);
         } else {
-            throw new RuntimeException("Exam with id " + exam.getId() + " was not assigned to student with id " + this.getId());
+            throw new ExamNotFoundException(exam.getId());
         }
     }
 }

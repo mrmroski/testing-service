@@ -1,5 +1,7 @@
 package com.javadevs.testingservice.service;
 
+import com.javadevs.testingservice.exception.ExamNotFoundException;
+import com.javadevs.testingservice.exception.StudentSubjectsNotCoveredException;
 import com.javadevs.testingservice.model.Exam;
 import com.javadevs.testingservice.model.Question;
 import com.javadevs.testingservice.model.Student;
@@ -40,7 +42,7 @@ public class ExamService {
             }
 
             if (!found) {
-                throw new RuntimeException("student hasn't covered these subjects!");
+                throw new StudentSubjectsNotCoveredException();
             }
         }
 
@@ -59,7 +61,7 @@ public class ExamService {
     @Transactional(readOnly = true)
     public Exam findExamById(long id) {
         return examRepository.findExamById(id)
-                .orElseThrow(() -> new RuntimeException((String.format("Exam with id %s not found!", id))));
+                .orElseThrow(() -> new ExamNotFoundException(id));
     }
 
     @Transactional(readOnly = true)
