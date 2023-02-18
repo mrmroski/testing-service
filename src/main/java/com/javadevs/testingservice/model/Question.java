@@ -1,5 +1,7 @@
 package com.javadevs.testingservice.model;
 
+import com.javadevs.testingservice.exception.AnswerIsAlreadyAddedException;
+import com.javadevs.testingservice.exception.AnswerWasNotAddedException;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,7 +39,7 @@ public class Question {
         if (noneIdMatch) {
             this.answers.add(other);
         } else {
-            throw new RuntimeException("Answer with id " + other.getId() + " is already added!");
+            throw new AnswerIsAlreadyAddedException(other.getId());
         }
     }
 
@@ -45,7 +47,7 @@ public class Question {
         Answer toDelete = this.answers.stream()
                 .filter(curr -> curr.getId() == answerId)
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Answer with id " + answerId + " wasn't added!"));
+                .orElseThrow(() -> new AnswerWasNotAddedException(answerId));
         this.answers.remove(toDelete);
     }
 }

@@ -1,11 +1,11 @@
 package com.javadevs.testingservice.model;
 
+import com.javadevs.testingservice.exception.SubjectIsAlreadyCoveredException;
+import com.javadevs.testingservice.exception.SubjectWasNotCoveredException;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @ToString(exclude = {"subjectsCovered"})
@@ -45,7 +45,7 @@ public class Student {
         if (noneIdMatch) {
             this.subjectsCovered.add(other);
         } else {
-            throw new RuntimeException("Subject with id " + other.getId() + " is already covered!");
+            throw new SubjectIsAlreadyCoveredException(other.getId());
         }
     }
 
@@ -63,7 +63,7 @@ public class Student {
         Subject toDelete = this.subjectsCovered.stream()
                 .filter(curr -> curr.getId() == other.getId())
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Subject with id " + other.getId() + " wasn't covered!"));
+                .orElseThrow(() -> new SubjectWasNotCoveredException(other.getId()));
         this.subjectsCovered.remove(toDelete);
     }
 
