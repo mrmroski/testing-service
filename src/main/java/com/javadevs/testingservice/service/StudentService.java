@@ -65,16 +65,6 @@ public class StudentService {
         student.addSubject(subject);
     }
 
-//    @Transactional
-//    public void assignQuestion(AssignQuestionToStudentCommand cmd) {
-//        Student student = studentRepository.findById(cmd.getStudentId())
-//                .orElseThrow(() -> new RuntimeException("Student with id " + cmd.getStudentId() + " not found!"));
-//        Question question = questionRepository.findById(cmd.getQuestionId())
-//                .orElseThrow(() -> new RuntimeException("Question with id " + cmd.getQuestionId() + " not found!"));
-//
-//        student.assignQuestion(question);
-//    }
-
     @Transactional
     public void deleteSubjectCovered(DeleteSubjectCoveredFromStudentCommand cmd) {
         Student student = studentRepository.findById(cmd.getStudentId())
@@ -84,14 +74,4 @@ public class StudentService {
 
         student.deleteSubject(subject);
     }
-
-//    @Transactional
-//    public void unassignQuestion(UnassignQuestionFromStudentCommand cmd) {
-//        Student student = studentRepository.findById(cmd.getStudentId())
-//                .orElseThrow(() -> new RuntimeException("Student with id " + cmd.getStudentId() + " not found!"));
-//        Question question = questionRepository.findById(cmd.getQuestionId())
-//                .orElseThrow(() -> new RuntimeException("Question with id " + cmd.getQuestionId() + " not found!"));
-//
-//        student.unassignQuestion(question);
-//    }
 }
