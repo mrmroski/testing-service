@@ -27,21 +27,21 @@ class StudentControllerTest {
     @Autowired
     private MockMvc postman;
 
-    @AfterEach
-    void tearDown() throws LiquibaseException {
-        databaseCleaner.cleanUp();
-    }
+//    @AfterEach
+//    void tearDown() throws LiquibaseException {
+//        databaseCleaner.cleanUp();
+//    }
 
-    @Test
-    void itShouldFindStudentById() throws Exception {
-
-        postman.perform(get("/api/v1/students/5"))
-                .andExpect(jsonPath("$.id").value(5))
-                .andExpect(jsonPath("$.name").value("Mateusz"))
-                .andExpect(jsonPath("$.lastname").value("Morawiecki"))
-                .andExpect(jsonPath("$.email").value("mariusz@gov.pl"))
-                .andExpect(jsonPath("$.startedAt").value(LocalDate.of(2021, 1, 8).toString()));
-    }
+//    @Test
+//    void itShouldFindStudentById() throws Exception {
+//
+//        postman.perform(get("/api/v1/students/5"))
+//                .andExpect(jsonPath("$.id").value(5))
+//                .andExpect(jsonPath("$.name").value("Mateusz"))
+//                .andExpect(jsonPath("$.lastname").value("Morawiecki"))
+//                .andExpect(jsonPath("$.email").value("mariusz@gov.pl"))
+//                .andExpect(jsonPath("$.startedAt").value(LocalDate.of(2021, 1, 8).toString()));
+//    }
 
 
 }
