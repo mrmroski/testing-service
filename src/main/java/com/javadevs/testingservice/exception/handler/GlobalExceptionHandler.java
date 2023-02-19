@@ -53,7 +53,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ExamNotFoundException.class)
     public ResponseEntity<ExamNotFoundResponseBody> handleExamNotFoundException(ExamNotFoundException exc) {
-        return ResponseEntity.badRequest().body(new ExamNotFoundResponseBody("EXAM_WITH_ID_NOT_FOUND", exc.getId()));
+        return ResponseEntity.badRequest().body(new ExamNotFoundResponseBody("EXAM_NOT_FOUND", exc.getId()));
     }
 
     @ExceptionHandler(StudentSubjectsNotCoveredException.class)
@@ -66,55 +66,55 @@ public class GlobalExceptionHandler {
     @Value
     static class QuestionNotFoundResponseBody {
         String code;
-        long questionId;
+        Long questionId;
     }
 
     @Value
     static class StudentNotFoundResponseBody {
         String code;
-        long studentId;
+        Long studentId;
     }
 
     @Value
     static class SubjectNotFoundResponseBody {
         String code;
-        long subjectId;
+        Long subjectId;
     }
 
     @Value
     static class SubjectWasNotCoveredResponseBody {
         String code;
-        long subjectId;
+        Long subjectId;
     }
 
     @Value
     static class SubjectIsAlreadyCoveredResponseBody {
         String code;
-        long subjectId;
+        Long subjectId;
     }
 
     @Value
     static class AnswerIsAlreadyAddedResponseBody {
         String code;
-        long answerId;
+        Long answerId;
     }
 
     @Value
     static class AnswerWasNotAddedResponseBody {
         String code;
-        long answerId;
+        Long answerId;
     }
 
     @Value
     static class ExamAlreadyAssignedResponseBody {
         String code;
-        long answerId;
+        Long examId;
     }
 
     @Value
     static class ExamNotFoundResponseBody {
         String code;
-        long answerId;
+        Long examId;
     }
 
     @Value
