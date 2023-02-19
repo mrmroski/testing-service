@@ -1,5 +1,6 @@
 package com.javadevs.testingservice.service;
 
+import com.javadevs.testingservice.exception.QuestionNotFoundException;
 import com.javadevs.testingservice.model.Answer;
 import com.javadevs.testingservice.model.Question;
 import com.javadevs.testingservice.model.Subject;
@@ -55,7 +56,7 @@ public class QuestionService {
     @Transactional(readOnly = true)
     public Question findQuestionById(long id) {
         return questionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException((String.format("Question with id %s not found!", id))));
+                .orElseThrow(() -> new QuestionNotFoundException(id));
     }
 
     //TODO: in memory problem (widok)
@@ -69,14 +70,14 @@ public class QuestionService {
         if (questionRepository.existsById(id)) {
             questionRepository.deleteById(id);
         } else {
-            throw new RuntimeException(String.format("Question with id %s not found!", id));
+            throw new QuestionNotFoundException(id);
         }
     }
 
     @Transactional
     public Question editQuestion(long id, EditQuestionCommand cmd) {
         Question s =  questionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException((String.format("Question with id %s not found!", id))));
+                .orElseThrow(() -> new QuestionNotFoundException(id));
         Subject sub = subjectService.findSubjectById(cmd.getSubjectId());
 
         s.setQuestion(cmd.getQuestion());
@@ -88,7 +89,7 @@ public class QuestionService {
     @Transactional
     public Question editQuestionPartially(long id, EditQuestionCommand cmd) {
         Question s =  questionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException((String.format("Question with id %s not found!", id))));
+                .orElseThrow(() -> new QuestionNotFoundException(id));
 
         Optional.ofNullable(cmd.getSubjectId()).ifPresent(x -> {
             Subject sub = subjectService.findSubjectById(x);
@@ -102,7 +103,7 @@ public class QuestionService {
     @Transactional
     public void addAnswer(AddAnswerCommand cmd) {
         Question s =  questionRepository.findById(cmd.getQuestionId())
-                .orElseThrow(() -> new RuntimeException((String.format("Question with id %s not found!", cmd.getQuestionId()))));
+                .orElseThrow(() -> new QuestionNotFoundException(cmd.getQuestionId()));
 
         Answer ans = new Answer();
         ans.setQuestion(s);
@@ -115,9 +116,14 @@ public class QuestionService {
     @Transactional
     public void deleteAnswer(DeleteAnswerCommand cmd) {
         Question s =  questionRepository.findById(cmd.getQuestionId())
-                .orElseThrow(() -> new RuntimeException((String.format("Question with id %s not found!", cmd.getQuestionId()))));
+                .orElseThrow(() -> new QuestionNotFoundException(cmd.getQuestionId()));
 
         s.deleteAnswer(cmd.getAnswerId());
         answerRepository.deleteById(cmd.getAnswerId());
+    }
+
+    @Transactional(readOnly = true)
+    public Set<Question> findQuestionsByIds(Set<Long> ids) {
+        return questionRepository.findQuestionsByIds(ids);
     }
 }

@@ -1,13 +1,12 @@
 package com.javadevs.testingservice.service;
 
-import com.javadevs.testingservice.model.Question;
+import com.javadevs.testingservice.exception.StudentNotFoundException;
+import com.javadevs.testingservice.exception.SubjectNotFoundException;
 import com.javadevs.testingservice.model.Student;
 import com.javadevs.testingservice.model.Subject;
 import com.javadevs.testingservice.model.command.studentEdit.AddSubjectCoveredToStudentCommand;
-import com.javadevs.testingservice.model.command.studentEdit.AssignQuestionToStudentCommand;
 import com.javadevs.testingservice.model.command.create.CreateStudentCommand;
 import com.javadevs.testingservice.model.command.studentEdit.DeleteSubjectCoveredFromStudentCommand;
-import com.javadevs.testingservice.model.command.studentEdit.UnassignQuestionFromStudentCommand;
 import com.javadevs.testingservice.repository.QuestionRepository;
 import com.javadevs.testingservice.repository.StudentRepository;
 import com.javadevs.testingservice.repository.SubjectRepository;
@@ -36,7 +35,7 @@ public class StudentService {
     @Transactional(readOnly = true)
     public Student findStudentById(long id) {
         return studentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException((String.format("Student with id %s not found!", id))));
+                .orElseThrow(() -> new StudentNotFoundException(id));
     }
 
     @Transactional(readOnly = true)
@@ -49,47 +48,27 @@ public class StudentService {
         if (studentRepository.existsById(id)) {
             studentRepository.deleteById(id);
         } else {
-            throw new RuntimeException(String.format("Student with id %s not found!", id));
+            throw new StudentNotFoundException(id);
         }
     }
 
     @Transactional
     public void addSubjectCovered(AddSubjectCoveredToStudentCommand cmd) {
         Student student = studentRepository.findById(cmd.getStudentId())
-                .orElseThrow(() -> new RuntimeException("Student with id " + cmd.getStudentId() + " not found!"));
+                .orElseThrow(() -> new StudentNotFoundException(cmd.getStudentId()));
         Subject subject = subjectRepository.findSubjectById(cmd.getSubjectId())
-                .orElseThrow(() -> new RuntimeException("Subject with id " + cmd.getSubjectId() + " not found!"));
+                .orElseThrow(() -> new SubjectNotFoundException(cmd.getSubjectId()));
 
         student.addSubject(subject);
     }
 
-//    @Transactional
-//    public void assignQuestion(AssignQuestionToStudentCommand cmd) {
-//        Student student = studentRepository.findById(cmd.getStudentId())
-//                .orElseThrow(() -> new RuntimeException("Student with id " + cmd.getStudentId() + " not found!"));
-//        Question question = questionRepository.findById(cmd.getQuestionId())
-//                .orElseThrow(() -> new RuntimeException("Question with id " + cmd.getQuestionId() + " not found!"));
-//
-//        student.assignQuestion(question);
-//    }
-
     @Transactional
     public void deleteSubjectCovered(DeleteSubjectCoveredFromStudentCommand cmd) {
         Student student = studentRepository.findById(cmd.getStudentId())
-                .orElseThrow(() -> new RuntimeException("Student with id " + cmd.getStudentId() + " not found!"));
+                .orElseThrow(() -> new StudentNotFoundException(cmd.getStudentId()));
         Subject subject = subjectRepository.findSubjectById(cmd.getSubjectId())
-                .orElseThrow(() -> new RuntimeException("Subject with id " + cmd.getSubjectId() + " not found!"));
+                .orElseThrow(() -> new SubjectNotFoundException(cmd.getSubjectId()));
 
         student.deleteSubject(subject);
     }
-
-//    @Transactional
-//    public void unassignQuestion(UnassignQuestionFromStudentCommand cmd) {
-//        Student student = studentRepository.findById(cmd.getStudentId())
-//                .orElseThrow(() -> new RuntimeException("Student with id " + cmd.getStudentId() + " not found!"));
-//        Question question = questionRepository.findById(cmd.getQuestionId())
-//                .orElseThrow(() -> new RuntimeException("Question with id " + cmd.getQuestionId() + " not found!"));
-//
-//        student.unassignQuestion(question);
-//    }
 }

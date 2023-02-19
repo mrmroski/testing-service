@@ -2,9 +2,7 @@ package com.javadevs.testingservice.controller;
 
 import com.javadevs.testingservice.model.command.studentEdit.AddSubjectCoveredToStudentCommand;
 import com.javadevs.testingservice.model.command.create.CreateStudentCommand;
-import com.javadevs.testingservice.model.command.studentEdit.AssignQuestionToStudentCommand;
 import com.javadevs.testingservice.model.command.studentEdit.DeleteSubjectCoveredFromStudentCommand;
-import com.javadevs.testingservice.model.command.studentEdit.UnassignQuestionFromStudentCommand;
 import com.javadevs.testingservice.model.dto.StudentDto;
 import com.javadevs.testingservice.service.StudentService;
 import jakarta.validation.Valid;
@@ -74,15 +72,6 @@ public class StudentController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-//    @PatchMapping("/{studentId}/assignQuestion")
-//    public ResponseEntity<?> assignQuestion(@PathVariable("studentId") long id,
-//                                               @RequestBody @Valid AssignQuestionToStudentCommand cmd) {
-//        log.info("assignQuestion({})", id);
-//
-//        studentService.assignQuestion(cmd);
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
-
     @PatchMapping("/{studentId}/deleteSubject")
     public ResponseEntity<?> deleteSubject(@PathVariable("studentId") long id,
                                                @RequestBody @Valid DeleteSubjectCoveredFromStudentCommand cmd) {
@@ -92,12 +81,4 @@ public class StudentController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-//    @PatchMapping("/{studentId}/unassignQuestion")
-//    public ResponseEntity<?> unassignQuestion(@PathVariable("studentId") long id,
-//                                               @RequestBody @Valid UnassignQuestionFromStudentCommand cmd) {
-//        log.info("unassignQuestion({})", id);
-//
-//        studentService.unassignQuestion(cmd);
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
 }
