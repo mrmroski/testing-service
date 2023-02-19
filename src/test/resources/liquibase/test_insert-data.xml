@@ -36,7 +36,29 @@
             <column header="correct" name="correct"/>
             <column header="question_id" name="question_id"/>
         </loadData>
-        
+
+        <loadData encoding="UTF-8" file="/liquibase/data/test_exams.csv" quotchar="&quot;" separator=","
+                  tableName="exams">
+            <column header="exam_id" name="exam_id"/>
+            <column header="created_at" name="created_at"/>
+            <column header="description" name="description"/>
+            <column header="version" name="version"/>
+            <column header="deleted" name="deleted"/>
+            <column header="student_id" name="student_id"/>
+        </loadData>
+
+        <loadData encoding="UTF-8" file="/liquibase/data/test_student_subject.csv" quotchar="&quot;" separator=","
+                  tableName="student_subject">
+            <column header="student_id" name="student_id"/>
+            <column header="subject_id" name="subject_id"/>
+        </loadData>
+
+        <loadData encoding="UTF-8" file="/liquibase/data/test_exam_question.csv" quotchar="&quot;" separator=","
+                  tableName="exam_question">
+            <column header="exam_id" name="exam_id"/>
+            <column header="question_id" name="question_id"/>
+        </loadData>
+
     </changeSet>
 
 </databaseChangeLog>

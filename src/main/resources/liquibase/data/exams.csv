@@ -1,0 +1,10 @@
+exam_id,created_at,description,version,deleted,student_id
+1,2022-05-05,Pierwszy test,0,false,5
+2,2023-02-02,Drugi test,0,false,4
+3,2022-05-15,Trzeci test,0,false,3
+4,2022-11-11,Czwarty test,0,false,3
+5,2022-04-25,Piaty test,0,false,7
+6,2023-02-17,Szosty test,0,false,1
+7,2021-12-12,Siodmy test,0,false,2
+8,2023-05-30,Osmy test,0,false,8
+9,2022-10-10,Dziewiwaty test,0,false,9
