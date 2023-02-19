@@ -17,7 +17,7 @@ public class Subject {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "subjectSequenceGenerator")
-    @SequenceGenerator(name = "subjectSequenceGenerator", allocationSize = 100, initialValue = 10,
+    @SequenceGenerator(name = "subjectSequenceGenerator", allocationSize = 100, initialValue = 100,
             sequenceName = "subject_sequence_generator")
     @Column(name = "subject_id")
     private long id;

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet author="patryk" id="patryk_002">
+
+        <loadData encoding="UTF-8" file="/liquibase/data/students.csv" quotchar="&quot;" separator=","
+                  tableName="students">
+            <column header="student_id" name="student_id"/>
+            <column header="name" name="name"/>
+            <column header="lastname" name="lastname"/>
+            <column header="started_at" name="started_at"/>
+            <column header="email" name="email"/>
+        </loadData>
+
+        <loadData encoding="UTF-8" file="/liquibase/data/subjects.csv" quotchar="&quot;" separator=","
+                  tableName="subjects">
+            <column header="subject_id" name="subject_id"/>
+            <column header="subject" name="subject"/>
+            <column header="description" name="description"/>
+        </loadData>
+
+        <loadData encoding="UTF-8" file="/liquibase/data/questions.csv" quotchar="&quot;" separator=","
+                  tableName="questions">
+            <column header="question_id" name="question_id"/>
+            <column header="question" name="question"/>
+            <column header="question_type" name="question_type"/>
+            <column header="subject_id" name="subject_id"/>
+        </loadData>
+
+        <loadData encoding="UTF-8" file="/liquibase/data/answers.csv" quotchar="&quot;" separator=","
+                  tableName="answers">
+            <column header="answer_id" name="answer_id"/>
+            <column header="answer" name="answer"/>
+            <column header="correct" name="correct"/>
+            <column header="question_id" name="question_id"/>
+        </loadData>
+
+        <loadData encoding="UTF-8" file="/liquibase/data/exams.csv" quotchar="&quot;" separator=","
+                  tableName="exams">
+            <column header="exam_id" name="exam_id"/>
+            <column header="created_at" name="created_at"/>
+            <column header="description" name="description"/>
+            <column header="version" name="version"/>
+            <column header="deleted" name="deleted"/>
+            <column header="student_id" name="student_id"/>
+        </loadData>
+
+        <loadData encoding="UTF-8" file="/liquibase/data/student_subject.csv" quotchar="&quot;" separator=","
+                  tableName="student_subject">
+            <column header="student_id" name="student_id"/>
+            <column header="subject_id" name="subject_id"/>
+        </loadData>
+
+        <loadData encoding="UTF-8" file="/liquibase/data/exam_question.csv" quotchar="&quot;" separator=","
+                  tableName="exam_question">
+            <column header="exam_id" name="exam_id"/>
+            <column header="question_id" name="question_id"/>
+        </loadData>
+        
+    </changeSet>
+
+</databaseChangeLog>

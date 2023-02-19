@@ -1,0 +1,10 @@
+question_id,question,question_type,subject_id
+1,Question1,MULTIPLE_CHOICE,1
+2,Question2,MULTIPLE_CHOICE,1
+3,Question3,MULTIPLE_CHOICE,2
+4,Question4,MULTIPLE_CHOICE,3
+5,Question5,MULTIPLE_CHOICE,2
+6,Question6,MULTIPLE_CHOICE,4
+7,Question7,MULTIPLE_CHOICE,6
+8,Question8,MULTIPLE_CHOICE,9
+9,Question9,MULTIPLE_CHOICE,8

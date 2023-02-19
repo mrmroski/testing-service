@@ -27,7 +27,7 @@ public class Exam {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "examsSequenceGenerator")
-    @SequenceGenerator(name = "examsSequenceGenerator", allocationSize = 100, initialValue = 10,
+    @SequenceGenerator(name = "examsSequenceGenerator", allocationSize = 100, initialValue = 100,
             sequenceName = "exams_sequence_generator")
     @Column(name = "exam_id")
     private long id;
