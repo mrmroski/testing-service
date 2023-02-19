@@ -1,5 +1,6 @@
 package com.javadevs.testingservice.service;
 
+import com.javadevs.testingservice.exception.SubjectNotFoundException;
 import com.javadevs.testingservice.model.Student;
 import com.javadevs.testingservice.model.Subject;
 import com.javadevs.testingservice.model.command.create.CreateSubjectCommand;
@@ -33,7 +34,7 @@ public class SubjectService {
     @Transactional(readOnly = true)
     public Subject findSubjectById(long id) {
         return subjectRepository.findSubjectById(id)
-                .orElseThrow(() -> new RuntimeException((String.format("Subject with id %s not found!", id))));
+                .orElseThrow(() -> new SubjectNotFoundException(id));
     }
 
     @Transactional(readOnly = true)
@@ -49,14 +50,14 @@ public class SubjectService {
             students.forEach(x -> x.getSubjectsCovered().removeIf(s -> s.getId() == id));
             subjectRepository.deleteById(id);
         } else {
-            throw new RuntimeException(String.format("Subject with id %s not found!", id));
+            throw new SubjectNotFoundException(id);
         }
     }
 
     @Transactional
     public Subject editSubject(long id, EditSubjectCommand cmd) {
         Subject s =  subjectRepository.findSubjectById(id)
-                .orElseThrow(() -> new RuntimeException((String.format("Subject with id %s not found!", id))));
+                .orElseThrow(() -> new SubjectNotFoundException(id));
 
         s.setSubject(cmd.getSubject());
         s.setDescription(cmd.getDescription());
@@ -66,7 +67,7 @@ public class SubjectService {
     @Transactional
     public Subject editSubjectPartially(long id, EditSubjectCommand cmd) {
         Subject s =  subjectRepository.findSubjectById(id)
-                .orElseThrow(() -> new RuntimeException((String.format("Subject with id %s not found!", id))));
+                .orElseThrow(() -> new SubjectNotFoundException(id));
 
         Optional.ofNullable(cmd.getSubject()).ifPresent(s::setSubject);
         Optional.ofNullable(cmd.getDescription()).ifPresent(s::setDescription);

@@ -1,5 +1,9 @@
 package com.javadevs.testingservice.model;
 
+import com.javadevs.testingservice.exception.ExamAlreadyAssignedException;
+import com.javadevs.testingservice.exception.ExamNotFoundException;
+import com.javadevs.testingservice.exception.SubjectIsAlreadyCoveredException;
+import com.javadevs.testingservice.exception.SubjectWasNotCoveredException;
 import jakarta.persistence.*;
 
 import lombok.*;
@@ -23,7 +27,7 @@ public class Student {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "studentSequenceGenerator")
-    @SequenceGenerator(name = "studentSequenceGenerator", allocationSize = 100, initialValue = 10,
+    @SequenceGenerator(name = "studentSequenceGenerator", allocationSize = 100, initialValue = 100,
             sequenceName = "student_sequence_generator")
     @Column(name = "student_id")
     private long id;
@@ -40,10 +44,8 @@ public class Student {
             inverseJoinColumns = @JoinColumn(name = "subject_id"))
     private Set<Subject> subjectsCovered;
 
-//    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-//    @JoinTable(name = "student_questions", joinColumns = @JoinColumn(name = "student_id"),
-//            inverseJoinColumns = @JoinColumn(name = "question_id"))
-//    private Set<Question> questions;
+    @OneToMany(mappedBy = "student", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Set<Exam> exams;
 
     public void addSubject(Subject other) {
         boolean noneIdMatch = this.subjectsCovered.stream()
@@ -51,33 +53,33 @@ public class Student {
         if (noneIdMatch) {
             this.subjectsCovered.add(other);
         } else {
-            throw new RuntimeException("Subject with id " + other.getId() + " is already covered!");
+            throw new SubjectIsAlreadyCoveredException(other.getId());
         }
     }
-
-//    public void assignQuestion(Question other) {
-//        boolean noneIdMatch = this.questions.stream()
-//                .noneMatch(curr -> curr.getId() == other.getId());
-//        if (noneIdMatch) {
-//            this.questions.add(other);
-//        } else {
-//            throw new RuntimeException("Question with id " + other.getId() + " is already assigned!");
-//        }
-//    }
 
     public void deleteSubject(Subject other) {
         Subject toDelete = this.subjectsCovered.stream()
                 .filter(curr -> curr.getId() == other.getId())
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Subject with id " + other.getId() + " wasn't covered!"));
+                .orElseThrow(() -> new SubjectWasNotCoveredException(other.getId()));
         this.subjectsCovered.remove(toDelete);
     }
 
-//    public void unassignQuestion(Question other) {
-//        Question toDelete = this.questions.stream()
-//                .filter(curr -> curr.getId() == other.getId())
-//                .findFirst()
-//                .orElseThrow(() -> new RuntimeException("Question with id " + other.getId() + " wasn't assigned!"));
-//        this.questions.remove(toDelete);
-//    }
+    public void assignExam(Exam exam) {
+        if (!exams.contains(exam)) {
+            this.exams.add(exam);
+            exam.setStudent(this);
+        } else {
+            throw new ExamAlreadyAssignedException(exam.getId());
+        }
+    }
+
+    public void removeExam(Exam exam) {
+        if (exams.contains(exam)) {
+            this.exams.remove(exam);
+            exam.setStudent(null);
+        } else {
+            throw new ExamNotFoundException(exam.getId());
+        }
+    }
 }

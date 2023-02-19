@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet author="patryk" id="patryk_001">
+
+        <sql>
+            CREATE TYPE question_type AS ENUM ('MULTIPLE_CHOICE', 'MULTIPLE_ANSWER', 'OPEN_ENDED');
+
+            create sequence answer_sequence_generator start with 100 increment by 100;
+            create sequence question_sequence_generator start with 100 increment by 100;
+            create sequence student_sequence_generator start with 100 increment by 100;
+            create sequence subject_sequence_generator start with 100 increment by 100;
+            create sequence exams_sequence_generator start with 100 increment by 100;
+
+            create table answers (answer_id bigint not null, answer varchar(255), correct boolean, question_id bigint,
+                primary key (answer_id));
+            create table questions (question_id bigint not null, question varchar(255), question_type question_type,
+                subject_id bigint, primary key (question_id));
+            create table student_subject (student_id bigint not null, subject_id bigint not null,
+                primary key (student_id, subject_id));
+            create table students (student_id bigint not null, email varchar(255), lastname varchar(255),
+                name varchar(255), started_at date, primary key (student_id));
+            create table subjects (subject_id bigint not null, description varchar(255), subject varchar(255),
+                primary key (subject_id));
+            create table exam_question (exam_id bigint not null, question_id bigint not null, primary key (exam_id, question_id));
+            create table exams (exam_id bigint not null, created_at date, deleted boolean not null,
+                description varchar(255), version bigint not null, student_id bigint, primary key (exam_id));
+
+            alter table if exists answers add constraint question_answer_fk foreign key (question_id) references questions;
+            alter table if exists questions add constraint subject_question_fk foreign key (subject_id) references subjects;
+            alter table if exists student_subject add constraint FKnromnee07rgl5931jp9glhd5l foreign key (subject_id) references subjects;
+            alter table if exists student_subject add constraint FKg1wxq596xek6a6gdo3kw33l4w foreign key (student_id) references students;
+            alter table if exists exam_question add constraint FKr3wyfnkav2kjirb09n48n8q2v foreign key (question_id) references questions;
+            alter table if exists exam_question add constraint FK7via7ws322avfbl1qx7jhnpt1 foreign key (exam_id) references exams;
+            alter table if exists exams add constraint student_exam_fk foreign key (student_id) references students;
+
+        </sql>
+
+
+            <rollback>
+                <dropTable tableName="answers"/>
+                <dropTable tableName="questions"/>
+                <dropTable tableName="subjects"/>
+                <dropTable tableName="students"/>
+            </rollback>
+
+    </changeSet>
+
+
+
+</databaseChangeLog>

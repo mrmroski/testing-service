@@ -5,10 +5,7 @@ import com.javadevs.testingservice.model.dto.AnswerDto;
 import com.javadevs.testingservice.model.dto.QuestionDto;
 import com.javadevs.testingservice.model.dto.SubjectDto;
 import org.modelmapper.Converter;
-import org.modelmapper.ModelMapper;
 import org.modelmapper.spi.MappingContext;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
