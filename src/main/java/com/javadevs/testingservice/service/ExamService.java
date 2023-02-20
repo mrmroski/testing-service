@@ -26,13 +26,14 @@ public class ExamService {
     private final ModelMapper modelMapper;
     private final QuestionService questionService;
     private final StudentService studentService;
+    private final EmailSenderService emailSenderService;
 
     @Transactional
     public Exam saveExam(CreateExamCommand command) {
         Student student = studentService.findStudentById(command.getStudentId());
         Set<Question> questions = questionService.findQuestionsByIds(command.getQuestions());
 
-        for (Question q: questions) {
+        for (Question q : questions) {
             boolean found = false;
             for (Subject s : student.getSubjectsCovered()) {
                 if (q.getSubject().getId() == s.getId()) {
@@ -54,6 +55,9 @@ public class ExamService {
                 .build();
 
         student.assignExam(exam);
+
+        //commented because we dont want to get banned on gmail neither spam on random emails :D
+        //emailSenderService.sendPreparingMail(exam.getStudent().getEmail(), questions);
 
         return examRepository.save(exam);
     }
