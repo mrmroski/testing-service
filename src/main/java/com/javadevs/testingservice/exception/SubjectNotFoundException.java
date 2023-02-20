@@ -4,5 +4,5 @@ import lombok.Value;
 
 @Value
 public class SubjectNotFoundException extends RuntimeException {
-    long id;
+    Long id;
 }
