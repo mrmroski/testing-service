@@ -1,8 +1,16 @@
 package com.javadevs.testingservice.exception.handler;
 
-import com.javadevs.testingservice.exception.*;
+import com.javadevs.testingservice.exception.AnswerIsAlreadyAddedException;
+import com.javadevs.testingservice.exception.AnswerWasNotAddedException;
+import com.javadevs.testingservice.exception.ExamAlreadyAssignedException;
+import com.javadevs.testingservice.exception.ExamNotFoundException;
+import com.javadevs.testingservice.exception.QuestionNotFoundException;
+import com.javadevs.testingservice.exception.StudentNotFoundException;
+import com.javadevs.testingservice.exception.StudentSubjectsNotCoveredException;
+import com.javadevs.testingservice.exception.SubjectIsAlreadyCoveredException;
+import com.javadevs.testingservice.exception.SubjectNotFoundException;
+import com.javadevs.testingservice.exception.SubjectWasNotCoveredException;
 import lombok.Value;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -60,7 +68,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<StudentSubjectNotCoveredResponseBody> handleStudentSubjectNotCoveredException(StudentSubjectsNotCoveredException exc) {
         return ResponseEntity.badRequest().body(new StudentSubjectNotCoveredResponseBody("STUDENT_HAS_NOT_COVERED_SUBJECTS"));
     }
-
 
 
     @Value

@@ -1,8 +1,6 @@
 package com.javadevs.testingservice.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.javadevs.testingservice.model.Answer;
 import com.javadevs.testingservice.model.Question;
 import com.javadevs.testingservice.model.QuestionType;
 import com.javadevs.testingservice.model.Subject;
@@ -13,7 +11,6 @@ import com.javadevs.testingservice.repository.QuestionRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,8 +49,8 @@ public class QuestionControllerTest {
         String subjectS = mapper.writeValueAsString(sCmd);
 
         String subResp = postman.perform(MockMvcRequestBuilders.post("/api/v1/subjects")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(subjectS))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(subjectS))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andReturn()
                 .getResponse()
@@ -184,14 +181,14 @@ public class QuestionControllerTest {
         Question question = mapper.readValue(respQ, Question.class);
 
         //when then
-        postman.perform(MockMvcRequestBuilders.get("/api/v1/questions/"+question.getId()))
+        postman.perform(MockMvcRequestBuilders.get("/api/v1/questions/" + question.getId()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(question.getId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.question").value("stolica polski?"));
     }
 
     @Test
-    void shouldDeleteQuestion() throws Exception{
+    void shouldDeleteQuestion() throws Exception {
         //given
         CreateSubjectCommand sCmd = CreateSubjectCommand.builder()
                 .subject("stolice")
@@ -230,7 +227,7 @@ public class QuestionControllerTest {
         Question question = mapper.readValue(respQ, Question.class);
 
         //when
-        postman.perform(MockMvcRequestBuilders.delete("/api/v1/questions/"+question.getId()))
+        postman.perform(MockMvcRequestBuilders.delete("/api/v1/questions/" + question.getId()))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         //then
@@ -238,7 +235,7 @@ public class QuestionControllerTest {
     }
 
     @Test
-    void shoudEditQuestion() throws Exception{
+    void shoudEditQuestion() throws Exception {
         //given
         CreateSubjectCommand sCmd = CreateSubjectCommand.builder()
                 .subject("stolice")

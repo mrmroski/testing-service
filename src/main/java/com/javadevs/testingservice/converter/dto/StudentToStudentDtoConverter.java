@@ -28,14 +28,12 @@ public class StudentToStudentDtoConverter implements Converter<Student, StudentD
                 .lastname(student.getLastname())
                 .startedAt(student.getStartedAt())
                 .subjects(sc.stream()
-                        .map(x -> {
-                            SubjectDto dto = SubjectDto.builder()
-                                    .subject(x.getSubject())
-                                    .description(x.getDescription())
-                                    .id(x.getId())
-                                    .build();
-                            return dto;
-                        }).collect(Collectors.toSet()))
+                        .map(subject -> SubjectDto.builder()
+                                .subject(subject.getSubject())
+                                .description(subject.getDescription())
+                                .id(subject.getId())
+                                .build()).collect(Collectors.toSet())
+                )
                 .build();
     }
 }

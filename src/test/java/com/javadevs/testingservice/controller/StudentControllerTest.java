@@ -1,6 +1,5 @@
 package com.javadevs.testingservice.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javadevs.testingservice.DatabaseCleaner;
 import com.javadevs.testingservice.TestingServiceApplication;
@@ -23,9 +22,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.Set;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -187,8 +189,8 @@ class StudentControllerTest {
         String commandString = mapper.writeValueAsString(command);
 
         postman.perform(patch("/api/v1/students/" + savedStudent.getId() + "/addSubject")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(commandString))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(commandString))
                 .andExpect(status().isOk());
     }
 
