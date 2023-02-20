@@ -33,5 +33,8 @@ class ExamControllerTest {
         examRepository.deleteAll();
     }
 
+    @Test
+    void itShouldSaveExam() {
 
+    }
 }
