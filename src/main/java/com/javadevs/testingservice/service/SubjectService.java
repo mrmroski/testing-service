@@ -56,7 +56,7 @@ public class SubjectService {
 
     @Transactional
     public Subject editSubject(long id, EditSubjectCommand cmd) {
-        Subject s =  subjectRepository.findSubjectById(id)
+        Subject s = subjectRepository.findSubjectById(id)
                 .orElseThrow(() -> new SubjectNotFoundException(id));
 
         s.setSubject(cmd.getSubject());
@@ -66,7 +66,7 @@ public class SubjectService {
 
     @Transactional
     public Subject editSubjectPartially(long id, EditSubjectCommand cmd) {
-        Subject s =  subjectRepository.findSubjectById(id)
+        Subject s = subjectRepository.findSubjectById(id)
                 .orElseThrow(() -> new SubjectNotFoundException(id));
 
         Optional.ofNullable(cmd.getSubject()).ifPresent(s::setSubject);

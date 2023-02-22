@@ -40,14 +40,14 @@ public class QuestionService {
         q.setSubject(subject);
 
         Set<Answer> answers = command.getAnswers().stream()
-                        .map(cmd -> {
-                            Answer ans = new Answer();
-                            ans.setAnswer(cmd.getAnswer());
-                            ans.setCorrect(cmd.getCorrect());
-                            ans.setQuestion(q);
-                            return ans;
-                        })
-                        .collect(Collectors.toSet());
+                .map(cmd -> {
+                    Answer ans = new Answer();
+                    ans.setAnswer(cmd.getAnswer());
+                    ans.setCorrect(cmd.getCorrect());
+                    ans.setQuestion(q);
+                    return ans;
+                })
+                .collect(Collectors.toSet());
         q.setAnswers(answers);
 
         return questionRepository.save(q);
@@ -76,7 +76,7 @@ public class QuestionService {
 
     @Transactional
     public Question editQuestion(long id, EditQuestionCommand cmd) {
-        Question s =  questionRepository.findById(id)
+        Question s = questionRepository.findById(id)
                 .orElseThrow(() -> new QuestionNotFoundException(id));
         Subject sub = subjectService.findSubjectById(cmd.getSubjectId());
 
@@ -88,7 +88,7 @@ public class QuestionService {
 
     @Transactional
     public Question editQuestionPartially(long id, EditQuestionCommand cmd) {
-        Question s =  questionRepository.findById(id)
+        Question s = questionRepository.findById(id)
                 .orElseThrow(() -> new QuestionNotFoundException(id));
 
         Optional.ofNullable(cmd.getSubjectId()).ifPresent(x -> {
@@ -102,7 +102,7 @@ public class QuestionService {
 
     @Transactional
     public void addAnswer(AddAnswerCommand cmd) {
-        Question s =  questionRepository.findById(cmd.getQuestionId())
+        Question s = questionRepository.findById(cmd.getQuestionId())
                 .orElseThrow(() -> new QuestionNotFoundException(cmd.getQuestionId()));
 
         Answer ans = new Answer();
@@ -115,7 +115,7 @@ public class QuestionService {
 
     @Transactional
     public void deleteAnswer(DeleteAnswerCommand cmd) {
-        Question s =  questionRepository.findById(cmd.getQuestionId())
+        Question s = questionRepository.findById(cmd.getQuestionId())
                 .orElseThrow(() -> new QuestionNotFoundException(cmd.getQuestionId()));
 
         s.deleteAnswer(cmd.getAnswerId());

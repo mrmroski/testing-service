@@ -8,7 +8,6 @@ import java.util.Optional;
 
 public interface SubjectRepository extends JpaRepository<Subject, Long> {
 
-
     @Query("SELECT DISTINCT s FROM Subject s LEFT JOIN FETCH s.questions WHERE s.id=?1")
     Optional<Subject> findSubjectById(long id);
 }

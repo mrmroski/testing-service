@@ -6,9 +6,11 @@ import com.javadevs.testingservice.model.dto.StudentDto;
 import com.javadevs.testingservice.model.dto.SubjectDto;
 import org.modelmapper.Converter;
 import org.modelmapper.spi.MappingContext;
+import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
 
+@Service
 public class ExamToExamDtoConverter implements Converter<Exam, ExamDto> {
     @Override
     public ExamDto convert(MappingContext<Exam, ExamDto> mappingContext) {
@@ -24,13 +26,15 @@ public class ExamToExamDtoConverter implements Converter<Exam, ExamDto> {
                         .name(exam.getStudent().getName())
                         .lastname(exam.getStudent().getLastname())
                         .startedAt(exam.getCreatedAt())
-                        .subjects(exam.getStudent().getSubjectsCovered().stream().map(sub ->
-                            SubjectDto.builder()
-                                    .id(sub.getId())
-                                    .subject(sub.getSubject())
-                                    .description(sub.getDescription())
-                                    .build()
-                        ).collect(Collectors.toSet()))
+                        .subjects(exam.getStudent().getSubjectsCovered()
+                                .stream()
+                                .map(sub ->
+                                        SubjectDto.builder()
+                                                .id(sub.getId())
+                                                .subject(sub.getSubject())
+                                                .description(sub.getDescription())
+                                                .build()
+                                ).collect(Collectors.toSet()))
                         .build()
                 )
                 .build();

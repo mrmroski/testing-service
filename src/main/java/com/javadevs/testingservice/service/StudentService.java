@@ -4,7 +4,6 @@ import com.javadevs.testingservice.exception.StudentNotFoundException;
 import com.javadevs.testingservice.exception.SubjectNotFoundException;
 import com.javadevs.testingservice.model.Student;
 import com.javadevs.testingservice.model.Subject;
-import com.javadevs.testingservice.model.command.studentEdit.AddSubjectCoveredToStudentCommand;
 import com.javadevs.testingservice.model.command.create.CreateStudentCommand;
 import com.javadevs.testingservice.model.command.edit.EditStudentCommand;
 import com.javadevs.testingservice.model.command.studentEdit.AddSubjectCoveredToStudentCommand;
@@ -66,6 +65,20 @@ public class StudentService {
         ofNullable(command.getStartedAt()).ifPresent(student::setStartedAt);
         ofNullable(command.getEmail()).ifPresent(student::setEmail);
         ofNullable(command.getVersion()).ifPresent(student::setVersion);
+
+        return studentRepository.saveAndFlush(student);
+    }
+
+    @Transactional
+    public Student editStudentPartially(long id, EditStudentCommand command) {
+        Student student = studentRepository.findById(id)
+                .map(studentToEdit -> {
+                    ofNullable(command.getName()).ifPresent(studentToEdit::setName);
+                    ofNullable(command.getLastname()).ifPresent(studentToEdit::setLastname);
+                    ofNullable(command.getEmail()).ifPresent(studentToEdit::setEmail);
+                    return studentToEdit;
+                }).orElseThrow(()
+                        -> new StudentNotFoundException(id));
 
         return studentRepository.saveAndFlush(student);
     }

@@ -1,9 +1,6 @@
 package com.javadevs.testingservice.model.dto;
 
-import com.javadevs.testingservice.model.Answer;
 import com.javadevs.testingservice.model.QuestionType;
-import com.javadevs.testingservice.model.Subject;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

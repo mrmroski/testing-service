@@ -1,8 +1,6 @@
 package com.javadevs.testingservice.exception.handler;
 
 import com.javadevs.testingservice.exception.*;
-import lombok.Value;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -53,7 +51,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ExamNotFoundException.class)
     public ResponseEntity<ExamNotFoundResponseBody> handleExamNotFoundException(ExamNotFoundException exc) {
-        return ResponseEntity.badRequest().body(new ExamNotFoundResponseBody("EXAM_WITH_ID_NOT_FOUND", exc.getId()));
+        return ResponseEntity.badRequest().body(new ExamNotFoundResponseBody("EXAM_NOT_FOUND", exc.getId()));
     }
 
     @ExceptionHandler(StudentSubjectsNotCoveredException.class)
@@ -62,64 +60,34 @@ public class GlobalExceptionHandler {
     }
 
 
-
-    @Value
-    static class QuestionNotFoundResponseBody {
-        String code;
-        long questionId;
+    record QuestionNotFoundResponseBody(String code, Long questionId) {
     }
 
-    @Value
-    static class StudentNotFoundResponseBody {
-        String code;
-        long studentId;
+    record StudentNotFoundResponseBody(String code, Long studentId) {
     }
 
-    @Value
-    static class SubjectNotFoundResponseBody {
-        String code;
-        long subjectId;
+    record SubjectNotFoundResponseBody(String code, Long subjectId) {
     }
 
-    @Value
-    static class SubjectWasNotCoveredResponseBody {
-        String code;
-        long subjectId;
+    record SubjectWasNotCoveredResponseBody(String code, Long subjectId) {
     }
 
-    @Value
-    static class SubjectIsAlreadyCoveredResponseBody {
-        String code;
-        long subjectId;
+    record SubjectIsAlreadyCoveredResponseBody(String code, Long subjectId) {
     }
 
-    @Value
-    static class AnswerIsAlreadyAddedResponseBody {
-        String code;
-        long answerId;
+    record AnswerIsAlreadyAddedResponseBody(String code, Long answerId) {
     }
 
-    @Value
-    static class AnswerWasNotAddedResponseBody {
-        String code;
-        long answerId;
+    record AnswerWasNotAddedResponseBody(String code, Long answerId) {
     }
 
-    @Value
-    static class ExamAlreadyAssignedResponseBody {
-        String code;
-        long answerId;
+    record ExamAlreadyAssignedResponseBody(String code, Long examId) {
     }
 
-    @Value
-    static class ExamNotFoundResponseBody {
-        String code;
-        long answerId;
+    record ExamNotFoundResponseBody(String code, Long examId) {
     }
 
-    @Value
-    static class StudentSubjectNotCoveredResponseBody {
-        String code;
+    record StudentSubjectNotCoveredResponseBody(String code) {
     }
 
 }

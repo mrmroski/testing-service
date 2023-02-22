@@ -1,12 +1,10 @@
 package com.javadevs.testingservice.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javadevs.testingservice.model.Subject;
 import com.javadevs.testingservice.model.command.create.CreateSubjectCommand;
 import com.javadevs.testingservice.model.command.edit.EditSubjectCommand;
 import com.javadevs.testingservice.repository.SubjectRepository;
-import jdk.jfr.ContentType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,8 +47,8 @@ public class SubjectControllerTest {
 
         //when
         String response = postman.perform(MockMvcRequestBuilders.post("/api/v1/subjects")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(cmdRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(cmdRequest))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.subject").value("test"))
@@ -115,8 +113,8 @@ public class SubjectControllerTest {
 
         String cmdRequest = mapper.writeValueAsString(cmd);
         String postResp = postman.perform(MockMvcRequestBuilders.post("/api/v1/subjects")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(cmdRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(cmdRequest))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();

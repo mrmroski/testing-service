@@ -10,7 +10,6 @@ import lombok.ToString;
 @Setter
 @ToString
 @Builder
-
 public class EditSubjectCommand {
     @NotEmpty(message = "SUBJECT_NOT_EMPTY")
     private String subject;

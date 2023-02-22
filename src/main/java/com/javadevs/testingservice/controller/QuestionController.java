@@ -15,7 +15,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -66,8 +74,7 @@ public class QuestionController {
 
     @PutMapping("/{questionId}")
     public ResponseEntity<QuestionDto> editQuestion(@PathVariable("questionId") long id,
-                                                    @RequestBody @Valid EditQuestionCommand cmd
-    ) {
+                                                    @RequestBody @Valid EditQuestionCommand cmd) {
         log.info("editQuestion({})", id);
 
         return new ResponseEntity<>(modelMapper
@@ -79,8 +86,7 @@ public class QuestionController {
     @PatchMapping("/{questionId}")
     //bez @valid by w commandzie moglt byc nulle
     public ResponseEntity<QuestionDto> editQuestionPartially(@PathVariable("questionId") long id,
-                                                    @RequestBody EditQuestionCommand cmd
-    ) {
+                                                             @RequestBody EditQuestionCommand cmd) {
         log.info("editQuestionPartially({})", id);
 
         return new ResponseEntity<>(modelMapper
@@ -91,8 +97,7 @@ public class QuestionController {
 
     @PatchMapping("/{questionId}/addAnswer")
     public ResponseEntity<?> addAnswer(@PathVariable("questionId") long id,
-                                       @RequestBody AddAnswerCommand cmd
-    ) {
+                                       @RequestBody AddAnswerCommand cmd) {
         log.info("addAnswer({})", id);
 
         questionService.addAnswer(cmd);
@@ -101,8 +106,7 @@ public class QuestionController {
 
     @PatchMapping("/{questionId}/deleteAnswer")
     public ResponseEntity<?> deleteAnswer(@PathVariable("questionId") long id,
-                                       @RequestBody DeleteAnswerCommand cmd
-    ) {
+                                          @RequestBody DeleteAnswerCommand cmd) {
         log.info("deleteAnswer({})", id);
 
         questionService.deleteAnswer(cmd);
