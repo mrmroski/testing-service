@@ -5,6 +5,7 @@ import com.javadevs.testingservice.exception.ExamNotFoundException;
 import com.javadevs.testingservice.exception.SubjectIsAlreadyCoveredException;
 import com.javadevs.testingservice.exception.SubjectWasNotCoveredException;
 
+import jakarta.persistence.Version;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import jakarta.persistence.CascadeType;

@@ -34,14 +34,6 @@ public class StudentToStudentDtoConverter implements Converter<Student, StudentD
                                 .id(subject.getId())
                                 .build()).collect(Collectors.toSet())
                 )
-                        .map(x -> {
-                            SubjectDto dto = SubjectDto.builder()
-                                    .subject(x.getSubject())
-                                    .description(x.getDescription())
-                                    .id(x.getId())
-                                    .build();
-                            return dto;
-                        }).collect(Collectors.toSet()))
                 .version(student.getVersion())
                 .build();
     }
