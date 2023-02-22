@@ -37,7 +37,7 @@ public class StudentService {
 
     @Transactional(readOnly = true)
     public Student findStudentById(long id) {
-        return studentRepository.findById(id)
+        return studentRepository.findByIdWithSubjects(id)
                 .orElseThrow(() -> new StudentNotFoundException(id));
     }
 
@@ -71,7 +71,7 @@ public class StudentService {
 
     @Transactional
     public void addSubjectCovered(AddSubjectCoveredToStudentCommand cmd) {
-        Student student = studentRepository.findById(cmd.getStudentId())
+        Student student = studentRepository.findByIdWithSubjects(cmd.getStudentId())
                 .orElseThrow(() -> new StudentNotFoundException(cmd.getStudentId()));
         Subject subject = subjectRepository.findSubjectById(cmd.getSubjectId())
                 .orElseThrow(() -> new SubjectNotFoundException(cmd.getSubjectId()));
@@ -81,7 +81,7 @@ public class StudentService {
 
     @Transactional
     public void deleteSubjectCovered(DeleteSubjectCoveredFromStudentCommand cmd) {
-        Student student = studentRepository.findById(cmd.getStudentId())
+        Student student = studentRepository.findByIdWithSubjects(cmd.getStudentId())
                 .orElseThrow(() -> new StudentNotFoundException(cmd.getStudentId()));
         Subject subject = subjectRepository.findSubjectById(cmd.getSubjectId())
                 .orElseThrow(() -> new SubjectNotFoundException(cmd.getSubjectId()));

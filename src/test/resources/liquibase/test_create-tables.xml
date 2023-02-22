@@ -6,6 +6,7 @@
     <changeSet author="patryk" id="patryk_02">
 
         <sql>
+            DROP TYPE IF EXISTS question_type;
             CREATE TYPE question_type AS ENUM ('MULTIPLE_CHOICE', 'MULTIPLE_ANSWER', 'OPEN_ENDED');
 
             create sequence answer_sequence_generator start with 100 increment by 100;
