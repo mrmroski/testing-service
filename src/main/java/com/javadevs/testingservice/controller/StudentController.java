@@ -75,7 +75,7 @@ public class StudentController {
 
     @PutMapping("/{studentId}")
     public ResponseEntity<?> editStudentPartially(@PathVariable("studentId") long studentId,
-                                                  @RequestBody EditStudentCommand command) {
+                                                  @RequestBody @Valid EditStudentCommand command) {
         log.info("editStudentPartially({}, {})", studentId, command);
         Student student = studentService.editStudentPartially(studentId, command);
         return new ResponseEntity<>(modelMapper.map(student, StudentDto.class), HttpStatus.OK);

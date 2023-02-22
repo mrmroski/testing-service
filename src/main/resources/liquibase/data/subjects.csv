@@ -1,12 +1,12 @@
-subject_id,subject,description
-1,Petle,Proste petle for
-2,UML,Wprowadzenie do obiektowosci
-3,Wyjatki,Budowanie Exception Handlera
-4,Klasy,Czym sa klasy w javie?
-5,Java1,Wprowadzenie do Javy
-6,Spring Boot,Pierwszy projekt w Springu
-7,Spring Cloud,Korzystanie z serwerow w chmurze
-8,Spring Security,OAuth i JwT
-9,Watki,Wielewatkosc
+subject_id,subject,description,deleted,version
+1,Petle,Proste petle for,false,0
+2,UML,Wprowadzenie do obiektowosci,false,0
+3,Wyjatki,Budowanie Exception Handlera,false,0
+4,Klasy,Czym sa klasy w javie?,false,0
+5,Java1,Wprowadzenie do Javy,false,0
+6,Spring Boot,Pierwszy projekt w Springu,false,0
+7,Spring Cloud,Korzystanie z serwerow w chmurze,false,0
+8,Spring Security,OAuth i JwT,false,0
+9,Watki,Wielewatkosc,false,0
 
 

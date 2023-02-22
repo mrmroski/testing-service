@@ -73,21 +73,9 @@ public class QuestionController {
     }
 
     @PutMapping("/{questionId}")
-    public ResponseEntity<QuestionDto> editQuestion(@PathVariable("questionId") long id,
-                                                    @RequestBody @Valid EditQuestionCommand cmd) {
-        log.info("editQuestion({})", id);
-
-        return new ResponseEntity<>(modelMapper
-                .map(questionService.editQuestion(id, cmd), QuestionDto.class),
-                HttpStatus.OK
-        );
-    }
-
-    @PatchMapping("/{questionId}")
-    //bez @valid by w commandzie moglt byc nulle
     public ResponseEntity<QuestionDto> editQuestionPartially(@PathVariable("questionId") long id,
                                                              @RequestBody EditQuestionCommand cmd) {
-        log.info("editQuestionPartially({})", id);
+        log.info("editQuestionPartially({}, {})", id, cmd);
 
         return new ResponseEntity<>(modelMapper
                 .map(questionService.editQuestionPartially(id, cmd), QuestionDto.class),

@@ -15,7 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+
+import static java.util.Optional.ofNullable;
 
 @Service
 @RequiredArgsConstructor
@@ -54,23 +55,15 @@ public class SubjectService {
         }
     }
 
-    @Transactional
-    public Subject editSubject(long id, EditSubjectCommand cmd) {
-        Subject s = subjectRepository.findSubjectById(id)
-                .orElseThrow(() -> new SubjectNotFoundException(id));
-
-        s.setSubject(cmd.getSubject());
-        s.setDescription(cmd.getDescription());
-        return s;
-    }
-
-    @Transactional
     public Subject editSubjectPartially(long id, EditSubjectCommand cmd) {
-        Subject s = subjectRepository.findSubjectById(id)
+
+        Subject subject = subjectRepository.findSubjectById(id)
                 .orElseThrow(() -> new SubjectNotFoundException(id));
 
-        Optional.ofNullable(cmd.getSubject()).ifPresent(s::setSubject);
-        Optional.ofNullable(cmd.getDescription()).ifPresent(s::setDescription);
-        return s;
+        ofNullable(cmd.getSubject()).ifPresent(subject::setSubject);
+        ofNullable(cmd.getDescription()).ifPresent(subject::setDescription);
+        ofNullable(cmd.getVersion()).ifPresent(subject::setVersion);
+
+        return subjectRepository.saveAndFlush(subject);
     }
 }

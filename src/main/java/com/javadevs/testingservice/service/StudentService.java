@@ -55,16 +55,16 @@ public class StudentService {
         }
     }
 
-    @Transactional
     public Student editStudentPartially(long id, EditStudentCommand command) {
-        Student student = studentRepository.findById(id)
-                .map(studentToEdit -> {
-                    ofNullable(command.getName()).ifPresent(studentToEdit::setName);
-                    ofNullable(command.getLastname()).ifPresent(studentToEdit::setLastname);
-                    ofNullable(command.getEmail()).ifPresent(studentToEdit::setEmail);
-                    return studentToEdit;
-                }).orElseThrow(()
-                        -> new StudentNotFoundException(id));
+
+        Student student = studentRepository.findByIdWithSubjects(id).orElseThrow(()
+                -> new StudentNotFoundException(id));
+
+        ofNullable(command.getName()).ifPresent(student::setName);
+        ofNullable(command.getLastname()).ifPresent(student::setLastname);
+        ofNullable(command.getStartedAt()).ifPresent(student::setStartedAt);
+        ofNullable(command.getEmail()).ifPresent(student::setEmail);
+        ofNullable(command.getVersion()).ifPresent(student::setVersion);
 
         return studentRepository.saveAndFlush(student);
     }

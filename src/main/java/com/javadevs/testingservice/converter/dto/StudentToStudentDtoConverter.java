@@ -34,6 +34,7 @@ public class StudentToStudentDtoConverter implements Converter<Student, StudentD
                                 .id(subject.getId())
                                 .build()).collect(Collectors.toSet())
                 )
+                .version(student.getVersion())
                 .build();
     }
 }
