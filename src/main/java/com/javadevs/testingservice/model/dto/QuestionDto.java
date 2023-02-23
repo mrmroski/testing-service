@@ -17,6 +17,6 @@ public class QuestionDto {
     private long id;
     private String question;
     private SubjectDto subject;
-    private QuestionType questionType;
     private Set<AnswerDto> answers;
+    private long version;
 }

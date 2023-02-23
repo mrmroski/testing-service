@@ -1,6 +1,7 @@
 package com.javadevs.testingservice.model.command.edit;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,8 +12,9 @@ import lombok.ToString;
 @ToString
 @Builder
 public class EditSubjectCommand {
-    @NotEmpty(message = "SUBJECT_NOT_EMPTY")
+
     private String subject;
-    @NotEmpty(message = "DESCRIPTION_NOT_EMPTY")
     private String description;
+    @NotNull(message = "VERSION_NOT_EMPTY")
+    private Long version;
 }

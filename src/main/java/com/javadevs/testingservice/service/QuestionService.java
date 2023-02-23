@@ -17,9 +17,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.util.Optional.ofNullable;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +37,6 @@ public class QuestionService {
 
         Question q = new Question();
         q.setQuestion(command.getQuestion());
-        q.setQuestionType(command.getQuestionType());
         q.setSubject(subject);
 
         Set<Answer> answers = command.getAnswers().stream()
@@ -74,30 +74,19 @@ public class QuestionService {
         }
     }
 
-    @Transactional
-    public Question editQuestion(long id, EditQuestionCommand cmd) {
-        Question s = questionRepository.findById(id)
-                .orElseThrow(() -> new QuestionNotFoundException(id));
-        Subject sub = subjectService.findSubjectById(cmd.getSubjectId());
-
-        s.setQuestion(cmd.getQuestion());
-        s.setQuestionType(cmd.getQuestionType());
-        s.setSubject(sub);
-        return s;
-    }
-
-    @Transactional
     public Question editQuestionPartially(long id, EditQuestionCommand cmd) {
-        Question s = questionRepository.findById(id)
+        Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new QuestionNotFoundException(id));
 
-        Optional.ofNullable(cmd.getSubjectId()).ifPresent(x -> {
+        ofNullable(cmd.getSubjectId()).ifPresent(x -> {
             Subject sub = subjectService.findSubjectById(x);
-            s.setSubject(sub);
+            question.setSubject(sub);
         });
-        Optional.ofNullable(cmd.getQuestion()).ifPresent(s::setQuestion);
-        Optional.ofNullable(cmd.getQuestionType()).ifPresent(s::setQuestionType);
-        return s;
+
+        ofNullable(cmd.getQuestion()).ifPresent(question::setQuestion);
+        ofNullable(cmd.getVersion()).ifPresent(question::setVersion);
+
+        return questionRepository.saveAndFlush(question);
     }
 
     @Transactional

@@ -14,4 +14,5 @@ public class SubjectDto {
     private long id;
     private String subject;
     private String description;
+    private long version;
 }

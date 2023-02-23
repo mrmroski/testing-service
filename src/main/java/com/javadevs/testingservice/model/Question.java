@@ -13,12 +13,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.util.Set;
 
@@ -30,6 +33,8 @@ import java.util.Set;
 @Entity(name = "Question")
 @Table(name = "questions")
 @Builder
+@SQLDelete(sql = "UPDATE questions SET deleted = true WHERE question_id=? AND version=?")
+@Where(clause = "deleted=false")
 public class Question {
 
     @Id
@@ -39,7 +44,9 @@ public class Question {
     @Column(name = "question_id")
     private long id;
     private String question;
-    private QuestionType questionType;
+    private boolean deleted;
+    @Version
+    private long version;
 
     @OneToMany(mappedBy = "question", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private Set<Answer> answers;

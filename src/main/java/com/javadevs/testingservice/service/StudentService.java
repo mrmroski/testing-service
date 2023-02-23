@@ -37,7 +37,7 @@ public class StudentService {
 
     @Transactional(readOnly = true)
     public Student findStudentById(long id) {
-        return studentRepository.findById(id)
+        return studentRepository.findByIdWithSubjects(id)
                 .orElseThrow(() -> new StudentNotFoundException(id));
     }
 
@@ -55,23 +55,23 @@ public class StudentService {
         }
     }
 
-    @Transactional
     public Student editStudentPartially(long id, EditStudentCommand command) {
-        Student student = studentRepository.findById(id)
-                .map(studentToEdit -> {
-                    ofNullable(command.getName()).ifPresent(studentToEdit::setName);
-                    ofNullable(command.getLastname()).ifPresent(studentToEdit::setLastname);
-                    ofNullable(command.getEmail()).ifPresent(studentToEdit::setEmail);
-                    return studentToEdit;
-                }).orElseThrow(()
-                        -> new StudentNotFoundException(id));
+
+        Student student = studentRepository.findByIdWithSubjects(id).orElseThrow(()
+                -> new StudentNotFoundException(id));
+
+        ofNullable(command.getName()).ifPresent(student::setName);
+        ofNullable(command.getLastname()).ifPresent(student::setLastname);
+        ofNullable(command.getStartedAt()).ifPresent(student::setStartedAt);
+        ofNullable(command.getEmail()).ifPresent(student::setEmail);
+        ofNullable(command.getVersion()).ifPresent(student::setVersion);
 
         return studentRepository.saveAndFlush(student);
     }
 
     @Transactional
     public void addSubjectCovered(AddSubjectCoveredToStudentCommand cmd) {
-        Student student = studentRepository.findById(cmd.getStudentId())
+        Student student = studentRepository.findByIdWithSubjects(cmd.getStudentId())
                 .orElseThrow(() -> new StudentNotFoundException(cmd.getStudentId()));
         Subject subject = subjectRepository.findSubjectById(cmd.getSubjectId())
                 .orElseThrow(() -> new SubjectNotFoundException(cmd.getSubjectId()));
@@ -81,7 +81,7 @@ public class StudentService {
 
     @Transactional
     public void deleteSubjectCovered(DeleteSubjectCoveredFromStudentCommand cmd) {
-        Student student = studentRepository.findById(cmd.getStudentId())
+        Student student = studentRepository.findByIdWithSubjects(cmd.getStudentId())
                 .orElseThrow(() -> new StudentNotFoundException(cmd.getStudentId()));
         Subject subject = subjectRepository.findSubjectById(cmd.getSubjectId())
                 .orElseThrow(() -> new SubjectNotFoundException(cmd.getSubjectId()));

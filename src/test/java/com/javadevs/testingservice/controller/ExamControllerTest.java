@@ -22,15 +22,9 @@ class ExamControllerTest {
     @Autowired
     private ExamRepository examRepository;
 
-    @Autowired
-
     @BeforeEach
     void clean() {
         examRepository.deleteAll();
     }
 
-    @Test
-    void itShouldSaveExam() {
-
-    }
 }
