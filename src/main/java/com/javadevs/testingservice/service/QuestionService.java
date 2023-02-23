@@ -37,7 +37,6 @@ public class QuestionService {
 
         Question q = new Question();
         q.setQuestion(command.getQuestion());
-        q.setQuestionType(command.getQuestionType());
         q.setSubject(subject);
 
         Set<Answer> answers = command.getAnswers().stream()
@@ -85,7 +84,6 @@ public class QuestionService {
         });
 
         ofNullable(cmd.getQuestion()).ifPresent(question::setQuestion);
-        ofNullable(cmd.getQuestionType()).ifPresent(question::setQuestionType);
         ofNullable(cmd.getVersion()).ifPresent(question::setVersion);
 
         return questionRepository.saveAndFlush(question);

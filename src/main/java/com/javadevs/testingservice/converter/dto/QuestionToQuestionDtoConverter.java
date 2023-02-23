@@ -34,7 +34,6 @@ public class QuestionToQuestionDtoConverter implements Converter<Question, Quest
                         .id(question.getSubject().getId())
                         .build()
                 )
-                .questionType(question.getQuestionType())
                 .version(question.getVersion())
                 .build();
     }

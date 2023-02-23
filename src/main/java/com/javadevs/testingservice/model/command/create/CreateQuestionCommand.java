@@ -25,7 +25,5 @@ public class CreateQuestionCommand {
     private Set<CreateAnswerCommand> answers;
     @Positive(message = "SUBJECT_ID_NOT_NEGATIVE")
     private Long subjectId;
-    @Enumerated(EnumType.STRING)
-    private QuestionType questionType;
 
 }

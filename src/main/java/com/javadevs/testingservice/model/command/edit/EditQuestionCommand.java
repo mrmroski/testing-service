@@ -18,7 +18,6 @@ import lombok.ToString;
 public class EditQuestionCommand {
     private String question;
     private Long subjectId;
-    private QuestionType questionType;
     @NotNull(message = "VERSION_NOT_EMPTY")
     private Long version;
 }

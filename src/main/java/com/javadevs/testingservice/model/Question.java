@@ -44,7 +44,6 @@ public class Question {
     @Column(name = "question_id")
     private long id;
     private String question;
-    private QuestionType questionType;
     private boolean deleted;
     @Version
     private long version;

@@ -29,7 +29,6 @@
                   tableName="questions">
             <column header="question_id" name="question_id"/>
             <column header="question" name="question"/>
-            <column header="question_type" name="question_type"/>
             <column header="subject_id" name="subject_id"/>
             <column header="version" name="version"/>
             <column header="deleted" name="deleted"/>

@@ -56,7 +56,6 @@ public class QuestionControllerTest {
 
         CreateQuestionCommand qCmd = CreateQuestionCommand.builder()
                 .question("stolica polski?")
-                .questionType(QuestionType.MULTIPLE_CHOICE)
                 .answers(answers)
                 .subjectId(5L)
                 .build();
@@ -68,7 +67,6 @@ public class QuestionControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.question").value("stolica polski?"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.questionType").value("MULTIPLE_CHOICE"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.subject.id").value(5))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.answers.length()").value(4));
     }
@@ -80,7 +78,6 @@ public class QuestionControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].question").value("Question1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].questionType").value("MULTIPLE_ANSWER"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(9));
     }
 
@@ -90,8 +87,7 @@ public class QuestionControllerTest {
         postman.perform(MockMvcRequestBuilders.get("/api/v1/questions/" + 1))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.question").value("Question1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.questionType").value("MULTIPLE_ANSWER"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.question").value("Question1"));
     }
 
     @Test
@@ -122,7 +118,6 @@ public class QuestionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.question").value("Poprawione pytanie"))
-                .andExpect(jsonPath("$.questionType").value("MULTIPLE_ANSWER"))
                 .andExpect(jsonPath("$.version").value(1));
     }
 }
