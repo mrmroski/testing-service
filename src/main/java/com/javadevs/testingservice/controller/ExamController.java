@@ -3,6 +3,7 @@ package com.javadevs.testingservice.controller;
 import com.javadevs.testingservice.model.command.create.CreateExamCommand;
 import com.javadevs.testingservice.model.dto.ExamDto;
 import com.javadevs.testingservice.service.ExamService;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,7 @@ public class ExamController {
     private final ModelMapper modelMapper;
 
     @PostMapping
-    public ResponseEntity<ExamDto> saveExam(@RequestBody @Valid CreateExamCommand command) {
+    public ResponseEntity<ExamDto> saveExam(@RequestBody @Valid CreateExamCommand command) throws MessagingException {
         log.info("saveExam({})", command);
 
         return new ResponseEntity<>(modelMapper
@@ -50,5 +51,12 @@ public class ExamController {
 
         return new ResponseEntity<>(examService.findAllExams(pageable)
                 .map(exam -> modelMapper.map(exam, ExamDto.class)), HttpStatus.OK);
+    }
+
+    @GetMapping("/accept-request/{examId}")
+    public String sendEmailWithTest(@PathVariable("examId") long examId) throws MessagingException {
+        log.info("sendEmailWithTest()");
+        examService.sendExam(examId);
+        return "Twój test został pomyślnie wysłany na twojego maila. POWODZENIA!";
     }
 }

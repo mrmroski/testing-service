@@ -8,6 +8,7 @@ import com.javadevs.testingservice.model.Student;
 import com.javadevs.testingservice.model.Subject;
 import com.javadevs.testingservice.model.command.create.CreateExamCommand;
 import com.javadevs.testingservice.repository.ExamRepository;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -29,7 +30,7 @@ public class ExamService {
     private final EmailSenderService emailSenderService;
 
     @Transactional
-    public Exam saveExam(CreateExamCommand command) {
+    public Exam saveExam(CreateExamCommand command) throws MessagingException {
         Student student = studentService.findStudentById(command.getStudentId());
         Set<Question> questions = questionService.findQuestionsByIds(command.getQuestions());
 
@@ -56,10 +57,12 @@ public class ExamService {
 
         student.assignExam(exam);
 
-        //commented because we dont want to get banned on gmail neither spam on random emails :D
-        //emailSenderService.sendPreparingMail(exam.getStudent().getEmail(), questions);
+        examRepository.save(exam);
 
-        return examRepository.save(exam);
+        //commented because we dont want to get banned on gmail neither spam on random emails :D
+        //emailSenderService.sendPreparingMail(student.getEmail(), exam.getId());
+
+        return exam;
     }
 
     @Transactional(readOnly = true)
@@ -71,5 +74,13 @@ public class ExamService {
     @Transactional(readOnly = true)
     public Page<Exam> findAllExams(Pageable pageable) {
         return examRepository.findAll(pageable);
+    }
+
+    public void sendExam(long examId) throws MessagingException {
+        Exam fetchedExam = findExamById(examId);
+        String email = fetchedExam.getStudent().getEmail();
+        Set<Question> questions = fetchedExam.getQuestions();
+
+        emailSenderService.sendStartOfTestMail(email, questions);
     }
 }
