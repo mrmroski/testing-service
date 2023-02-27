@@ -60,7 +60,7 @@ public class ExamService {
         examRepository.save(exam);
 
         //commented because we dont want to get banned on gmail neither spam on random emails :D
-        emailSenderService.sendPreparingMail(student.getEmail(), exam.getId());
+        //emailSenderService.sendPreparingMail(student.getEmail(), exam.getId());
 
         return exam;
     }
