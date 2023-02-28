@@ -1,6 +1,7 @@
 package com.javadevs.testingservice.service;
 
 import com.javadevs.testingservice.exception.QuestionNotFoundException;
+import com.javadevs.testingservice.exception.SubjectNotFoundException;
 import com.javadevs.testingservice.model.Answer;
 import com.javadevs.testingservice.model.Question;
 import com.javadevs.testingservice.model.Subject;
@@ -9,7 +10,9 @@ import com.javadevs.testingservice.model.command.edit.EditQuestionCommand;
 import com.javadevs.testingservice.model.command.questionEdit.AddAnswerCommand;
 import com.javadevs.testingservice.model.command.questionEdit.DeleteAnswerCommand;
 import com.javadevs.testingservice.repository.AnswerRepository;
+import com.javadevs.testingservice.repository.QuestionExamRepository;
 import com.javadevs.testingservice.repository.QuestionRepository;
+import com.javadevs.testingservice.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -27,12 +30,13 @@ public class QuestionService {
 
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
-    private final SubjectService subjectService;
-    private final ModelMapper mapper;
+    private final SubjectRepository subjectRepository;
+    private final QuestionExamRepository questionExamRepository;
 
     @Transactional
     public Question saveQuestion(CreateQuestionCommand command) {
-        Subject subject = subjectService.findSubjectById(command.getSubjectId());
+        Subject subject = subjectRepository.findSubjectById(command.getSubjectId())
+                .orElseThrow(() -> new SubjectNotFoundException(command.getSubjectId()));
 
         Question q = new Question();
         q.setQuestion(command.getQuestion());
@@ -55,67 +59,60 @@ public class QuestionService {
 
     @Transactional(readOnly = true)
     public Question findQuestionById(long id) {
-        return questionRepository.findById(id)
+        return questionRepository.findOneWithAnswersSubject(id)
                 .orElseThrow(() -> new QuestionNotFoundException(id));
     }
 
-    //TODO: in memory problem (widok)
     @Transactional(readOnly = true)
     public Page<Question> findAllQuestions(Pageable pageable) {
-        return questionRepository.findAllWithAnswers(pageable);
+        return questionRepository.findAllWithAnswersSubject(pageable);
     }
 
     @Transactional
     public void deleteQuestion(long id) {
-        if (questionRepository.existsById(id)) {
-            questionRepository.deleteById(id);
-        } else {
-            throw new QuestionNotFoundException(id);
-        }
-    }
-
-    @Transactional
-    public Question editQuestion(long id, EditQuestionCommand cmd) {
-        Question s = questionRepository.findById(id)
+        Question q = questionRepository.findById(id)
                 .orElseThrow(() -> new QuestionNotFoundException(id));
-        Subject sub = subjectService.findSubjectById(cmd.getSubjectId());
 
-        s.setQuestion(cmd.getQuestion());
-        s.setQuestionType(cmd.getQuestionType());
-        s.setSubject(sub);
-        return s;
+        questionExamRepository.softDeleteAllByQuestionId(id);
+        questionRepository.deleteById(id);
     }
 
-    @Transactional
     public Question editQuestionPartially(long id, EditQuestionCommand cmd) {
-        Question s = questionRepository.findById(id)
+        Question s = questionRepository.findByIdWithAnswers(id)
                 .orElseThrow(() -> new QuestionNotFoundException(id));
 
         Optional.ofNullable(cmd.getSubjectId()).ifPresent(x -> {
-            Subject sub = subjectService.findSubjectById(x);
+            Subject sub = subjectRepository.findOneWithStudents(x)
+                    .orElseThrow(() -> new SubjectNotFoundException(cmd.getSubjectId()));
             s.setSubject(sub);
         });
         Optional.ofNullable(cmd.getQuestion()).ifPresent(s::setQuestion);
         Optional.ofNullable(cmd.getQuestionType()).ifPresent(s::setQuestionType);
-        return s;
+        s.setVersion(cmd.getVersion());
+
+        questionRepository.saveAndFlush(s);
+        return questionRepository.findByIdWithAnswers(id).get();
     }
 
-    @Transactional
-    public void addAnswer(AddAnswerCommand cmd) {
-        Question s = questionRepository.findById(cmd.getQuestionId())
+    public Question addAnswer(AddAnswerCommand cmd) {
+        Question q = questionRepository.findOneWithAnswersSubject(cmd.getQuestionId())
                 .orElseThrow(() -> new QuestionNotFoundException(cmd.getQuestionId()));
 
         Answer ans = new Answer();
-        ans.setQuestion(s);
+        ans.setQuestion(q);
         ans.setAnswer(cmd.getAnswer());
         ans.setCorrect(cmd.getCorrect());
 
-        s.addAnswer(ans);
+        q.addAnswer(ans);
+        q.setVersion(cmd.getVersion());
+        q.setDummy(q.getDummy() + 1);
+
+        return questionRepository.save(q);
     }
 
     @Transactional
     public void deleteAnswer(DeleteAnswerCommand cmd) {
-        Question s = questionRepository.findById(cmd.getQuestionId())
+        Question s = questionRepository.findByIdWithAnswers(cmd.getQuestionId())
                 .orElseThrow(() -> new QuestionNotFoundException(cmd.getQuestionId()));
 
         s.deleteAnswer(cmd.getAnswerId());

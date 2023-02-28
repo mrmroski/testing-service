@@ -1,6 +1,5 @@
 package com.javadevs.testingservice.model;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,23 +8,28 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.util.Set;
 
-@ToString(exclude = {"questions"})
-@EqualsAndHashCode(exclude = {"questions"})
+@ToString(exclude = {"studentSubjects"})
+@EqualsAndHashCode(exclude = {"studentSubjects"})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "Subject")
 @Table(name = "subjects")
 @Builder
+@SQLDelete(sql = "UPDATE subjects SET deleted = true WHERE subject_id=? and version=?")
+@Where(clause = "deleted=false")
 public class Subject {
 
     @Id
@@ -37,6 +41,12 @@ public class Subject {
     private String subject;
     private String description;
 
-    @OneToMany(mappedBy = "subject", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
-    private Set<Question> questions;
+
+    @OneToMany(mappedBy = "subject")
+    private Set<StudentSubject> studentSubjects;
+
+    private boolean deleted;
+
+    @Version
+    private long version;
 }

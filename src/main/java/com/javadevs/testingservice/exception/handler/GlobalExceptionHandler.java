@@ -4,6 +4,7 @@ import com.javadevs.testingservice.exception.AnswerIsAlreadyAddedException;
 import com.javadevs.testingservice.exception.AnswerWasNotAddedException;
 import com.javadevs.testingservice.exception.ExamAlreadyAssignedException;
 import com.javadevs.testingservice.exception.ExamNotFoundException;
+import com.javadevs.testingservice.exception.OptimisticLockException;
 import com.javadevs.testingservice.exception.QuestionNotFoundException;
 import com.javadevs.testingservice.exception.StudentNotFoundException;
 import com.javadevs.testingservice.exception.StudentSubjectsNotCoveredException;
@@ -69,6 +70,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(new StudentSubjectNotCoveredResponseBody("STUDENT_HAS_NOT_COVERED_SUBJECTS"));
     }
 
+    @ExceptionHandler(OptimisticLockException.class)
+    public ResponseEntity<OptimisticLockBody> handleOptimisticLockException(OptimisticLockException exc) {
+        return ResponseEntity.badRequest().body(new OptimisticLockBody("ENTITY_DIFFERENT_VERSION", exc.getId(), exc.getCurrentVersion(), exc.getProvidedVersion()));
+    }
+
 
     @Value
     static class QuestionNotFoundResponseBody {
@@ -127,6 +133,14 @@ public class GlobalExceptionHandler {
     @Value
     static class StudentSubjectNotCoveredResponseBody {
         String code;
+    }
+
+    @Value
+    static class OptimisticLockBody {
+        String code;
+        Long id;
+        Long currentVersion;
+        Long providedVersion;
     }
 
 }

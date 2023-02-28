@@ -14,4 +14,5 @@ public class AnswerDto {
     private long id;
     private String answer;
     private Boolean correct;
+    private Long version;
 }

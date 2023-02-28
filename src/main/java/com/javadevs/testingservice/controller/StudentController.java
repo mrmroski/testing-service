@@ -73,21 +73,21 @@ public class StudentController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/{studentId}")
+    @PatchMapping("/{studentId}")
     public ResponseEntity<?> editStudentPartially(@PathVariable("studentId") long studentId,
-                                                  @RequestBody EditStudentCommand command) {
+                                                  @RequestBody @Valid EditStudentCommand command) {
         log.info("editStudentPartially({}, {})", studentId, command);
         Student student = studentService.editStudentPartially(studentId, command);
         return new ResponseEntity<>(modelMapper.map(student, StudentDto.class), HttpStatus.OK);
     }
 
     @PatchMapping("/{studentId}/addSubject")
-    public ResponseEntity<?> addSubjectCovered(@PathVariable("studentId") long id,
+    public ResponseEntity<StudentDto> addSubjectCovered(@PathVariable("studentId") long id,
                                                @RequestBody @Valid AddSubjectCoveredToStudentCommand cmd) {
         log.info("addSubjectCovered({})", id);
 
-        studentService.addSubjectCovered(cmd);
-        return new ResponseEntity<>(HttpStatus.OK);
+        var s = studentService.addSubjectCovered(cmd);
+        return new ResponseEntity<>(modelMapper.map(s , StudentDto.class), HttpStatus.OK);
     }
 
     @PatchMapping("/{studentId}/deleteSubject")

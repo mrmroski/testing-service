@@ -10,30 +10,32 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDate;
 import java.util.Set;
 
-@ToString(exclude = {"subjectsCovered"})
-@EqualsAndHashCode(exclude = {"subjectsCovered"})
+@ToString(exclude = {"studentSubjects", "exams"})
+@EqualsAndHashCode(exclude = {"studentSubjects", "exams"})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "Student")
 @Table(name = "students")
 @Builder
+@SQLDelete(sql = "UPDATE students SET deleted = true WHERE student_id=? and version=?")
+@Where(clause = "deleted=false")
 public class Student {
 
     @Id
@@ -41,36 +43,50 @@ public class Student {
     @SequenceGenerator(name = "studentSequenceGenerator", allocationSize = 100, initialValue = 100,
             sequenceName = "student_sequence_generator")
     @Column(name = "student_id")
-    private long id;
+    private Long id;
     private String name;
     private String lastname;
     private String email;
     private LocalDate startedAt;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "student_subject", joinColumns = @JoinColumn(name = "student_id"),
-            inverseJoinColumns = @JoinColumn(name = "subject_id"))
-    private Set<Subject> subjectsCovered;
+    @OneToMany(mappedBy = "student")
+    private Set<StudentSubject> studentSubjects;
 
-    @OneToMany(mappedBy = "student", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "student", cascade = {CascadeType.PERSIST})
     private Set<Exam> exams;
 
-    public void addSubject(Subject other) {
-        boolean noneIdMatch = this.subjectsCovered.stream()
-                .noneMatch(curr -> curr.getId() == other.getId());
+    private boolean deleted;
+
+    @Version
+    private long version;
+
+    private Long dummy;
+
+    public void addSubject(StudentSubject other) {
+        boolean noneIdMatch = this.studentSubjects.stream().map(StudentSubject::getSubject)
+                .noneMatch(curr -> curr.getId() == other.getSubject().getId());
+
         if (noneIdMatch) {
-            this.subjectsCovered.add(other);
+            this.studentSubjects.add(other);
         } else {
-            throw new SubjectIsAlreadyCoveredException(other.getId());
+            throw new SubjectIsAlreadyCoveredException(other.getSubject().getId());
         }
     }
 
-    public void deleteSubject(Subject other) {
-        Subject toDelete = this.subjectsCovered.stream()
-                .filter(curr -> curr.getId() == other.getId())
-                .findFirst()
-                .orElseThrow(() -> new SubjectWasNotCoveredException(other.getId()));
-        this.subjectsCovered.remove(toDelete);
+    public StudentSubject deleteSubject(Subject other) {
+        StudentSubject found = null;
+        for (StudentSubject ss : this.studentSubjects) {
+            if (ss.getSubject().getId() == other.getId()) {
+                found = ss;
+                this.studentSubjects.remove(ss);
+            }
+        }
+
+        if (found == null) {
+            throw new SubjectWasNotCoveredException(other.getId());
+        }
+
+        return found;
     }
 
     public void assignExam(Exam exam) {

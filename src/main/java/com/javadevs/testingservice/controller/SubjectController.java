@@ -64,21 +64,10 @@ public class SubjectController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/{subjectId}")
-    public ResponseEntity<SubjectDto> editSubject(@PathVariable("subjectId") long subjectId,
-                                                  @RequestBody @Valid EditSubjectCommand cmd) {
-        log.info("editSubject({})", subjectId);
-
-        return new ResponseEntity<>(modelMapper
-                .map(subjectService.editSubject(subjectId, cmd), SubjectDto.class),
-                HttpStatus.OK
-        );
-    }
-
     //bez @valid zeby mogly byc nulle w commandzie
     @PatchMapping("/{subjectId}")
     public ResponseEntity<SubjectDto> editSubjectPartially(@PathVariable("subjectId") long subjectId,
-                                                           @RequestBody EditSubjectCommand cmd) {
+                                                           @RequestBody @Valid EditSubjectCommand cmd) {
         log.info("editPartiallySubject({})", subjectId);
 
         return new ResponseEntity<>(modelMapper

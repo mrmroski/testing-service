@@ -19,5 +19,5 @@ public class ExamDto {
     private LocalDate createdAt;
     private String description;
     private Set<QuestionDto> questions;
-    private long version;
+    private Long version;
 }
