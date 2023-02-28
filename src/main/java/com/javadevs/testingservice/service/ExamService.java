@@ -14,6 +14,7 @@ import com.javadevs.testingservice.repository.ExamRepository;
 import com.javadevs.testingservice.repository.QuestionExamRepository;
 import com.javadevs.testingservice.repository.QuestionRepository;
 import com.javadevs.testingservice.repository.StudentRepository;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -35,10 +36,11 @@ public class ExamService {
     private final QuestionExamRepository qeRepository;
 
     @Transactional
-    public Exam saveExam(CreateExamCommand command) {
+    public Exam saveExam(CreateExamCommand command) throws MessagingException {
         Student student = studentRepository.findOneWithSubjects(command.getStudentId())
                 .orElseThrow(() -> new StudentNotFoundException(command.getStudentId()));
         Set<Question> questions = questionRepository.findQuestionsByIds(command.getQuestions());
+
 
         for (Question q : questions) {
             int found = 0;
@@ -63,6 +65,7 @@ public class ExamService {
         Exam saved = examRepository.saveAndFlush(exam);
         qeRepository.saveAll(questions.stream().map(q -> new QuestionExam(exam, q)).collect(Collectors.toSet()));
         return saved;
+
     }
 
     @Transactional(readOnly = true)
@@ -74,5 +77,13 @@ public class ExamService {
     @Transactional(readOnly = true)
     public Page<Exam> findAllExams(Pageable pageable) {
         return examRepository.findAllExams(pageable);
+    }
+
+    public void sendExam(long examId) throws MessagingException {
+        Exam fetchedExam = findExamById(examId);
+        String email = fetchedExam.getStudent().getEmail();
+        Set<Question> questions = fetchedExam.getQuestions();
+
+        emailSenderService.sendStartOfTestMail(email, questions);
     }
 }

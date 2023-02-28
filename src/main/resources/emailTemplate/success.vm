@@ -1,0 +1,12 @@
+<html>
+<body>
+    #set ($questionIndex = 1)
+    #foreach ($question in $message)
+    <tr>
+        <td style="padding-right: 20px; vertical-align: top">$questionIndex.</td>
+        <td style="padding-right: 20px; vertical-align: top">$question.question</td>
+    </tr>
+        #set ($questionIndex = $questionIndex + 1)
+    #end
+</body>
+</html>
