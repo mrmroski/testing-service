@@ -42,18 +42,16 @@ public class ExamService {
                 .orElseThrow(() -> new StudentNotFoundException(command.getStudentId()));
         Set<Question> questions = questionRepository.findQuestionsByIds(command.getQuestions());
 
-
+        int found = 0;
         for (Question q : questions) {
-            int found = 0;
             for (StudentSubject s : student.getStudentSubjects()) {
                 if (q.getSubject().getId() == s.getSubject().getId()) {
                     found += 1;
                 }
             }
-
-            if (found != questions.size()) {
-                throw new StudentSubjectsNotCoveredException();
-            }
+        }
+        if (found != questions.size()) {
+            throw new StudentSubjectsNotCoveredException();
         }
 
         Exam exam = new Exam();
