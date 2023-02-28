@@ -1,8 +1,8 @@
 package com.javadevs.testingservice.converter.dto;
 
+import com.javadevs.testingservice.controller.StudentController;
 import com.javadevs.testingservice.model.Student;
 import com.javadevs.testingservice.model.StudentSubject;
-import com.javadevs.testingservice.model.Subject;
 import com.javadevs.testingservice.model.dto.StudentDto;
 import com.javadevs.testingservice.model.dto.SubjectDto;
 import org.modelmapper.Converter;
@@ -13,6 +13,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @Service
 public class StudentToStudentDtoConverter implements Converter<Student, StudentDto> {
     @Override
@@ -22,7 +25,7 @@ public class StudentToStudentDtoConverter implements Converter<Student, StudentD
         if (student.getStudentSubjects() != null) {
             sc = student.getStudentSubjects();
         }
-        return StudentDto.builder()
+        StudentDto dto =  StudentDto.builder()
                 .id(student.getId())
                 .email(student.getEmail())
                 .name(student.getName())
@@ -41,5 +44,12 @@ public class StudentToStudentDtoConverter implements Converter<Student, StudentD
                 )
                 .version(student.getVersion())
                 .build();
+
+        dto.add(linkTo(methodOn(StudentController.class).addSubjectCovered(student.getId(), null)).withRel("add-subject"));
+        dto.add(linkTo(methodOn(StudentController.class).deleteSubject(student.getId(), null)).withRel("delete-subject"));
+        dto.add(linkTo(methodOn(StudentController.class).editStudentPartially(student.getId(), null)).withRel("edit-student"));
+        dto.add(linkTo(methodOn(StudentController.class).deleteStudentById(student.getId())).withRel("delete-student"));
+
+        return dto;
     }
 }

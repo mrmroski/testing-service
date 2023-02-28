@@ -1,24 +1,23 @@
 package com.javadevs.testingservice.model.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Value;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.time.LocalDate;
 import java.util.Set;
 
-@Data
+@EqualsAndHashCode(callSuper = true)
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class StudentDto {
+@Value
+public class StudentDto extends RepresentationModel<StudentDto> {
 
-    private long id;
-    private String name;
-    private String lastname;
-    private String email;
-    private LocalDate startedAt;
-    private Set<SubjectDto> subjects;
-    private Long version;
+    long id;
+    String name;
+    String lastname;
+    String email;
+    LocalDate startedAt;
+    Set<SubjectDto> subjects;
+    Long version;
 }

@@ -1,10 +1,11 @@
 package com.javadevs.testingservice.model.command.create;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import javax.validation.constraints.NotEmpty;
 
 @Getter
 @Setter
