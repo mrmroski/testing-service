@@ -40,7 +40,6 @@ public class QuestionService {
 
         Question q = new Question();
         q.setQuestion(command.getQuestion());
-        q.setQuestionType(command.getQuestionType());
         q.setSubject(subject);
 
         Set<Answer> answers = command.getAnswers().stream()
@@ -86,8 +85,7 @@ public class QuestionService {
                     .orElseThrow(() -> new SubjectNotFoundException(cmd.getSubjectId()));
             s.setSubject(sub);
         });
-        Optional.ofNullable(cmd.getQuestion()).ifPresent(s::setQuestion);
-        Optional.ofNullable(cmd.getQuestionType()).ifPresent(s::setQuestionType);
+        Optional.ofNullable(cmd.getQuestion()).ifPresent(s::setQuestion);;
         s.setVersion(cmd.getVersion());
 
         questionRepository.saveAndFlush(s);

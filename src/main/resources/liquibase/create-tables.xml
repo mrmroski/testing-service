@@ -6,8 +6,6 @@
     <changeSet author="patryk" id="patryk_001">
 
         <sql>
-            CREATE TYPE question_type AS ENUM ('MULTIPLE_CHOICE', 'MULTIPLE_ANSWER', 'OPEN_ENDED');
-
             create sequence answer_sequence_generator start with 100 increment by 100;
             create sequence question_sequence_generator start with 100 increment by 100;
             create sequence student_sequence_generator start with 100 increment by 100;
@@ -17,7 +15,7 @@
 
             create table answers (answer_id bigint not null, answer varchar(255), correct boolean, question_id bigint,
                 primary key (answer_id), deleted boolean not null, version bigint not null);
-            create table questions (question_id bigint not null, question varchar(255), question_type varchar(255),
+            create table questions (question_id bigint not null, question varchar(255),
                 subject_id bigint, primary key (question_id), deleted boolean not null, version bigint not null, dummy int not null);
             create table student_subject (student_student_id bigint not null, subject_subject_id bigint not null, deleted boolean not null,
                 primary key (student_student_id, subject_subject_id));

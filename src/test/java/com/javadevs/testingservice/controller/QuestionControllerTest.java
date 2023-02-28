@@ -2,7 +2,6 @@ package com.javadevs.testingservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javadevs.testingservice.model.Question;
-import com.javadevs.testingservice.model.QuestionType;
 import com.javadevs.testingservice.model.Subject;
 import com.javadevs.testingservice.model.command.create.CreateAnswerCommand;
 import com.javadevs.testingservice.model.command.create.CreateQuestionCommand;
@@ -66,7 +65,6 @@ public class QuestionControllerTest {
 
         CreateQuestionCommand qCmd = CreateQuestionCommand.builder()
                 .question("stolica polski?")
-                .questionType(QuestionType.MULTIPLE_CHOICE)
                 .answers(answers)
                 .subjectId(subject.getId())
                 .build();
@@ -90,7 +88,6 @@ public class QuestionControllerTest {
         //then
         Question saved = questionRepository.findById(question.getId()).get();
         Assertions.assertEquals(saved.getQuestion(), "stolica polski?");
-        Assertions.assertEquals(saved.getQuestionType(), QuestionType.MULTIPLE_CHOICE);
         Assertions.assertEquals(saved.getSubject(), subject);
     }
 
@@ -121,7 +118,6 @@ public class QuestionControllerTest {
 
         CreateQuestionCommand qCmd = CreateQuestionCommand.builder()
                 .question("stolica polski?")
-                .questionType(QuestionType.MULTIPLE_CHOICE)
                 .answers(answers)
                 .subjectId(subject.getId())
                 .build();
@@ -168,7 +164,6 @@ public class QuestionControllerTest {
 
         CreateQuestionCommand qCmd = CreateQuestionCommand.builder()
                 .question("stolica polski?")
-                .questionType(QuestionType.MULTIPLE_CHOICE)
                 .answers(answers)
                 .subjectId(subject.getId())
                 .build();
@@ -214,7 +209,6 @@ public class QuestionControllerTest {
 
         CreateQuestionCommand qCmd = CreateQuestionCommand.builder()
                 .question("stolica polski?")
-                .questionType(QuestionType.MULTIPLE_CHOICE)
                 .answers(answers)
                 .subjectId(subject.getId())
                 .build();
@@ -261,7 +255,6 @@ public class QuestionControllerTest {
 
         CreateQuestionCommand qCmd = CreateQuestionCommand.builder()
                 .question("stolica polski?")
-                .questionType(QuestionType.MULTIPLE_CHOICE)
                 .answers(answers)
                 .subjectId(subject.getId())
                 .build();

@@ -1,6 +1,5 @@
 package com.javadevs.testingservice.model.command.create;
 
-import com.javadevs.testingservice.model.QuestionType;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotEmpty;
@@ -25,7 +24,5 @@ public class CreateQuestionCommand {
     private Set<CreateAnswerCommand> answers;
     @Positive(message = "SUBJECT_ID_NOT_NEGATIVE")
     private Long subjectId;
-    @Enumerated(EnumType.STRING)
-    private QuestionType questionType;
 
 }

@@ -34,6 +34,7 @@ public class ExamService {
     private final QuestionRepository questionRepository;
     private final StudentRepository studentRepository;
     private final QuestionExamRepository qeRepository;
+    private final EmailSenderService emailSenderService;
 
     @Transactional
     public Exam saveExam(CreateExamCommand command) throws MessagingException {
@@ -82,7 +83,10 @@ public class ExamService {
     public void sendExam(long examId) throws MessagingException {
         Exam fetchedExam = findExamById(examId);
         String email = fetchedExam.getStudent().getEmail();
-        Set<Question> questions = fetchedExam.getQuestions();
+        Set<Question> questions = fetchedExam.getQuestionExams()
+                .stream()
+                .map(QuestionExam::getQuestion)
+                .collect(Collectors.toSet());
 
         emailSenderService.sendStartOfTestMail(email, questions);
     }

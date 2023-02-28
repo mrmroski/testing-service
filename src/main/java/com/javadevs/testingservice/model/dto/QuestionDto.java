@@ -1,6 +1,5 @@
 package com.javadevs.testingservice.model.dto;
 
-import com.javadevs.testingservice.model.QuestionType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +16,6 @@ public class QuestionDto {
     private long id;
     private String question;
     private SubjectDto subject;
-    private QuestionType questionType;
     private Set<AnswerDto> answers;
     private Long version;
 }

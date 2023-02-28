@@ -51,7 +51,6 @@ public class ExamToExamDtoConverter implements Converter<Exam, ExamDto> {
                                 .question(q.getQuestion())
                                 .id(q.getId())
                                 .version(q.getVersion())
-                                .questionType(q.getQuestionType())
                                 .subject(SubjectDto.builder()
                                         .subject(q.getSubject().getSubject())
                                         .id(q.getSubject().getId())

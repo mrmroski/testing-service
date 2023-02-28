@@ -50,9 +50,6 @@ public class Question {
     private long id;
     private String question;
 
-    @Enumerated(EnumType.STRING)
-    private QuestionType questionType;
-
     @OneToMany(mappedBy = "question", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<Answer> answers;
 
