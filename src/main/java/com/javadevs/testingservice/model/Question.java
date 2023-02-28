@@ -5,20 +5,28 @@ import com.javadevs.testingservice.exception.AnswerWasNotAddedException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.util.Set;
 
@@ -30,6 +38,8 @@ import java.util.Set;
 @Entity(name = "Question")
 @Table(name = "questions")
 @Builder
+@SQLDelete(sql = "UPDATE questions SET deleted = true WHERE question_id=? and version=?")
+@Where(clause = "deleted=false")
 public class Question {
 
     @Id
@@ -39,14 +49,27 @@ public class Question {
     @Column(name = "question_id")
     private long id;
     private String question;
+
+    @Enumerated(EnumType.STRING)
     private QuestionType questionType;
 
-    @OneToMany(mappedBy = "question", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @OneToMany(mappedBy = "question", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<Answer> answers;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subject_id")
     private Subject subject;
+
+    //for version to be always triggered
+    private int dummy;
+
+    @OneToMany(mappedBy = "question")
+    private Set<QuestionExam> questionExams;
+
+    private boolean deleted;
+
+    @Version
+    private long version;
 
     public void addAnswer(Answer other) {
         boolean noneIdMatch = this.answers.stream()

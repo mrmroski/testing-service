@@ -82,7 +82,7 @@ class StudentControllerTest {
         student.setEmail("rl@02.pl");
         student.setStartedAt(LocalDate.now());
         student.setExams(new HashSet<>());
-        student.setSubjectsCovered(new HashSet<>());
+        //student.setSubjectsCovered(new HashSet<>());
 
         Student savedStudent = studentRepository.save(student);
 
@@ -102,7 +102,7 @@ class StudentControllerTest {
         student.setEmail("rl@02.pl");
         student.setStartedAt(LocalDate.now());
         student.setExams(new HashSet<>());
-        student.setSubjectsCovered(new HashSet<>());
+        //student.setSubjectsCovered(new HashSet<>());
 
         Student savedStudent = studentRepository.save(student);
 
@@ -123,7 +123,7 @@ class StudentControllerTest {
         student.setEmail("rl@02.pl");
         student.setStartedAt(LocalDate.now());
         student.setExams(new HashSet<>());
-        student.setSubjectsCovered(new HashSet<>());
+        //student.setSubjectsCovered(new HashSet<>());
 
         Student savedStudent = studentRepository.save(student);
 
@@ -142,7 +142,7 @@ class StudentControllerTest {
         student.setEmail("rl@02.pl");
         student.setStartedAt(LocalDate.now());
         student.setExams(new HashSet<>());
-        student.setSubjectsCovered(new HashSet<>());
+        //student.setSubjectsCovered(new HashSet<>());
 
         Student savedStudent = studentRepository.save(student);
 
@@ -170,14 +170,14 @@ class StudentControllerTest {
         student.setEmail("rl@02.pl");
         student.setStartedAt(LocalDate.now());
         student.setExams(new HashSet<>());
-        student.setSubjectsCovered(new HashSet<>());
+        //student.setSubjectsCovered(new HashSet<>());
 
         Student savedStudent = studentRepository.save(student);
 
         Subject subject = new Subject();
         subject.setSubject("Petle");
         subject.setDescription("Wprowadzenie do petli");
-        subject.setQuestions(new HashSet<>());
+        //subject.setQuestions(new HashSet<>());
 
         Subject savedSubject = subjectRepository.save(subject);
 
@@ -203,14 +203,14 @@ class StudentControllerTest {
         student.setEmail("rl@02.pl");
         student.setStartedAt(LocalDate.now());
         student.setExams(new HashSet<>());
-        student.setSubjectsCovered(new HashSet<>());
+        //student.setSubjectsCovered(new HashSet<>());
 
         Student savedStudent = studentRepository.save(student);
 
         Subject subject = new Subject();
         subject.setSubject("Petle");
         subject.setDescription("Wprowadzenie do petli");
-        subject.setQuestions(new HashSet<>());
+        //subject.setQuestions(new HashSet<>());
 
         Subject savedSubject = subjectRepository.save(subject);
 

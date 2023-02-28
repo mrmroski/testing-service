@@ -24,6 +24,7 @@ public class QuestionToQuestionDtoConverter implements Converter<Question, Quest
                             dto.setAnswer(ans.getAnswer());
                             dto.setCorrect(ans.getCorrect());
                             dto.setId(ans.getId());
+                            dto.setVersion(ans.getVersion());
                             return dto;
                         })
                         .collect(Collectors.toSet()))
@@ -32,9 +33,11 @@ public class QuestionToQuestionDtoConverter implements Converter<Question, Quest
                         .subject(question.getSubject().getSubject())
                         .description(question.getSubject().getDescription())
                         .id(question.getSubject().getId())
+                        .version(question.getSubject().getVersion())
                         .build()
                 )
                 .questionType(question.getQuestionType())
+                .version(question.getVersion())
                 .build();
     }
 }

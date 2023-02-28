@@ -1,7 +1,11 @@
 package com.javadevs.testingservice.model;
 
+import com.javadevs.testingservice.exception.AnswerWasNotAddedException;
+import com.javadevs.testingservice.exception.QuestionNotFoundException;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
@@ -49,25 +54,12 @@ public class Exam {
     private long version;
     private boolean deleted;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id", referencedColumnName = "student_id", foreignKey = @ForeignKey(name = "student_exam_fk"))
     private Student student;
 
-    @ManyToMany
-    @JoinTable(name = "exam_question", joinColumns = @JoinColumn(name = "exam_id"),
-            inverseJoinColumns = @JoinColumn(name = "question_id"))
-    private Set<Question> questions;
+    @OneToMany(mappedBy = "exam")
+    private Set<QuestionExam> questionExams;
 
-    public void addQuestion(Question question) {
-        if (!questions.contains(question)) {
-            this.questions.add(question);
-        }
-    }
-
-    public void removeQuestion(Question question) {
-        if (questions.contains(question)) {
-            this.questions.remove(question);
-        }
-    }
 
 }

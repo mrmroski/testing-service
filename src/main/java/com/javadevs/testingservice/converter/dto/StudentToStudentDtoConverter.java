@@ -1,6 +1,7 @@
 package com.javadevs.testingservice.converter.dto;
 
 import com.javadevs.testingservice.model.Student;
+import com.javadevs.testingservice.model.StudentSubject;
 import com.javadevs.testingservice.model.Subject;
 import com.javadevs.testingservice.model.dto.StudentDto;
 import com.javadevs.testingservice.model.dto.SubjectDto;
@@ -17,9 +18,9 @@ public class StudentToStudentDtoConverter implements Converter<Student, StudentD
     @Override
     public StudentDto convert(MappingContext<Student, StudentDto> mappingContext) {
         Student student = mappingContext.getSource();
-        Set<Subject> sc = new HashSet<>();
-        if (student.getSubjectsCovered() != null) {
-            sc = student.getSubjectsCovered();
+        Set<StudentSubject> sc = new HashSet<>();
+        if (student.getStudentSubjects() != null) {
+            sc = student.getStudentSubjects();
         }
         return StudentDto.builder()
                 .id(student.getId())
@@ -27,13 +28,18 @@ public class StudentToStudentDtoConverter implements Converter<Student, StudentD
                 .name(student.getName())
                 .lastname(student.getLastname())
                 .startedAt(student.getStartedAt())
-                .subjects(sc.stream()
-                        .map(subject -> SubjectDto.builder()
-                                .subject(subject.getSubject())
-                                .description(subject.getDescription())
-                                .id(subject.getId())
-                                .build()).collect(Collectors.toSet())
+                .subjects(sc.stream().map(StudentSubject::getSubject)
+                        .map(x ->
+                            SubjectDto.builder()
+                                    .description(x.getDescription())
+                                    .subject(x.getSubject())
+                                    .id(x.getId())
+                                    .version(x.getVersion())
+                                    .build()
+                        )
+                        .collect(Collectors.toSet())
                 )
+                .version(student.getVersion())
                 .build();
     }
 }
