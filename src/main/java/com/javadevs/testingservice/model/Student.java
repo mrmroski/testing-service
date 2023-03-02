@@ -16,18 +16,24 @@ import org.hibernate.annotations.Where;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
-@ToString(exclude = {"studentSubjects", "exams"})
-@EqualsAndHashCode(exclude = {"studentSubjects", "exams"})
+//@ToString(exclude = {"subjects", "exams"})
+//@EqualsAndHashCode(exclude = {"subjects", "exams"})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -49,10 +55,15 @@ public class Student {
     private String email;
     private LocalDate startedAt;
 
-    @OneToMany(mappedBy = "student")
-    private Set<StudentSubject> studentSubjects;
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinTable(
+            name = "student_subject",
+            joinColumns = @JoinColumn(name = "student_id"),
+            inverseJoinColumns = @JoinColumn(name = "subject_id")
+    )
+    private Set<Subject> subjects;
 
-    @OneToMany(mappedBy = "student", cascade = {CascadeType.PERSIST})
+    @OneToMany(mappedBy = "student", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE})
     private Set<Exam> exams;
 
     private boolean deleted;
@@ -60,49 +71,56 @@ public class Student {
     @Version
     private long version;
 
-    private Long dummy;
 
-    public void addSubject(StudentSubject other) {
-        boolean noneIdMatch = this.studentSubjects.stream().map(StudentSubject::getSubject)
-                .noneMatch(curr -> curr.getId() == other.getSubject().getId());
+    public void addSubject(Subject other) {
+        boolean noneIdMatch = this.subjects.stream()
+                .noneMatch(curr -> curr.getId() == other.getId());
 
         if (noneIdMatch) {
-            this.studentSubjects.add(other);
+            this.subjects.add(other);
         } else {
-            throw new SubjectIsAlreadyCoveredException(other.getSubject().getId());
+            throw new SubjectIsAlreadyCoveredException(other.getId());
         }
     }
 
-    public StudentSubject deleteSubject(Subject other) {
-        StudentSubject found = null;
-        for (StudentSubject ss : this.studentSubjects) {
-            if (ss.getSubject().getId() == other.getId()) {
+    public void deleteSubject(Subject other) {
+        Subject found = null;
+        for (Subject ss : this.getSubjects()) {
+            if (ss.getId() == other.getId()) {
                 found = ss;
-                this.studentSubjects.remove(ss);
+                this.subjects.remove(ss);
             }
         }
 
         if (found == null) {
             throw new SubjectWasNotCoveredException(other.getId());
         }
-
-        return found;
     }
 
     public void assignExam(Exam exam) {
-        if (!exams.contains(exam)) {
-            this.exams.add(exam);
-            exam.setStudent(this);
-        } else {
-            throw new ExamAlreadyAssignedException(exam.getId());
-        }
+//        Exam found = null;
+//        for (Exam ss : this.getExams()) {
+//            if (ss.getId() == exam.getId()) {
+//                found = ss;
+//                this.exams.remove(ss);
+//            }
+//        }
+//
+//        if (found == null) {
+//            throw new ExamNotFoundException(exam.getId());
+//        }
     }
 
     public void removeExam(Exam exam) {
-        if (exams.contains(exam)) {
-            this.exams.remove(exam);
-            exam.setStudent(null);
-        } else {
+        Exam found = null;
+        for (Exam ss : this.getExams()) {
+            if (ss.getId() == exam.getId()) {
+                found = ss;
+                this.exams.remove(ss);
+            }
+        }
+
+        if (found == null) {
             throw new ExamNotFoundException(exam.getId());
         }
     }

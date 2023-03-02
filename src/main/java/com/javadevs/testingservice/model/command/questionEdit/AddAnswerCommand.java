@@ -23,7 +23,4 @@ public class AddAnswerCommand {
     private String answer;
     @NotNull(message = "CORRECT_NOT_EMPTY")
     private Boolean correct;
-    @NotNull(message = "VERSION_NOT_NULL")
-    @PositiveOrZero(message = "VERSION_NOT_NEGATIVE")
-    private Long version;
 }

@@ -9,6 +9,7 @@ import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -17,6 +18,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
@@ -31,10 +34,10 @@ import java.util.Set;
 @Entity(name = "Exam")
 @Table(name = "exams")
 @Builder
-@SQLDelete(sql = "UPDATE exams SET deleted = true WHERE exam_id=? AND version=?")
+@SQLDelete(sql = "UPDATE exams SET deleted = true WHERE exam_id=?")
 @Where(clause = "deleted=false")
-@ToString(exclude = {"student"})
-@EqualsAndHashCode(exclude = {"student"})
+@ToString(exclude = {"student", "questions"})
+@EqualsAndHashCode(exclude = {"student", "questions"})
 public class Exam {
 
     @Id
@@ -45,16 +48,21 @@ public class Exam {
     private long id;
     private LocalDate createdAt;
     private String description;
-    @Version
-    private long version;
+
     private boolean deleted;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "student_id", referencedColumnName = "student_id", foreignKey = @ForeignKey(name = "student_exam_fk"))
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "student_id",
+            referencedColumnName = "student_id",
+            foreignKey = @ForeignKey(name = "student_exam_fk")
+    )
     private Student student;
 
-    @OneToMany(mappedBy = "exam")
-    private Set<QuestionExam> questionExams;
-
-
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinTable(
+            name = "exam_question",
+            joinColumns = @JoinColumn(name = "exam_id"),
+            inverseJoinColumns = @JoinColumn(name = "question_id")
+    )
+    private Set<Question> questions;
 }

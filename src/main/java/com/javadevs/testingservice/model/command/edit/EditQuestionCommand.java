@@ -15,7 +15,6 @@ import javax.validation.constraints.PositiveOrZero;
 public class EditQuestionCommand {
     private String question;
     private Long subjectId;
-
     @NotNull(message = "VERSION_NOT_NULL")
     @PositiveOrZero(message = "VERSION_NOT_NEGATIVE")
     private Long version;
