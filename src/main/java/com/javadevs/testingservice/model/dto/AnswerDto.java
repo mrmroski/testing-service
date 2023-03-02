@@ -1,17 +1,18 @@
 package com.javadevs.testingservice.model.dto;
 
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Value;
-import org.springframework.hateoas.RepresentationModel;
+import com.javadevs.testingservice.model.Answer;
+import lombok.Data;
 
-@EqualsAndHashCode(callSuper = true)
-@Value
-@Builder
-public class AnswerDto extends RepresentationModel<AnswerDto> {
+@Data
+public class AnswerDto {
 
-    long id;
-    String answer;
-    Boolean correct;
-    Long version;
+    private long id;
+    private String answer;
+    private Boolean correct;
+
+    public AnswerDto(Answer src) {
+        this.id = src.getId();
+        this.answer = src.getAnswer();
+        this.correct = src.getCorrect();
+    }
 }

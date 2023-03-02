@@ -8,7 +8,4 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Set;
 
 public interface AnswerRepository extends JpaRepository<Answer, Long> {
-    @Modifying
-    @Query("UPDATE Answer a SET a.deleted=true WHERE a.question.id IN ?1")
-    void softDeleteAllByQuestionIds(Set<Long> ids);
 }

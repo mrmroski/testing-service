@@ -11,11 +11,6 @@ public class AnswerToAnswerDtoConverter implements Converter<Answer, AnswerDto> 
     @Override
     public AnswerDto convert(MappingContext<Answer, AnswerDto> mappingContext) {
         Answer answer = mappingContext.getSource();
-        return AnswerDto.builder()
-                .answer(answer.getAnswer())
-                .id(answer.getId())
-                .correct(answer.getCorrect())
-                .version(answer.getVersion())
-                .build();
+        return new AnswerDto(answer);
     }
 }

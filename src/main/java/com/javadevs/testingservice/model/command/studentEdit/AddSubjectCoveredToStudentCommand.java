@@ -21,7 +21,4 @@ public class AddSubjectCoveredToStudentCommand {
     @NotNull(message = "SUBJECT_ID_NOT_NULL")
     @Positive(message = "SUBJECT_ID_NOT_NEGATIVE")
     private Long subjectId;
-    @NotNull(message = "VERSION_NOT_NULL")
-    @PositiveOrZero(message = "VERSION_NOT_NEGATIVE")
-    private Long version;
 }

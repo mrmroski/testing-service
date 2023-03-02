@@ -1,5 +1,6 @@
 package com.javadevs.testingservice.service;
 
+import com.javadevs.testingservice.exception.AnswerWasNotAddedException;
 import com.javadevs.testingservice.exception.QuestionNotFoundException;
 import com.javadevs.testingservice.exception.SubjectNotFoundException;
 import com.javadevs.testingservice.model.Answer;
@@ -10,11 +11,9 @@ import com.javadevs.testingservice.model.command.edit.EditQuestionCommand;
 import com.javadevs.testingservice.model.command.questionEdit.AddAnswerCommand;
 import com.javadevs.testingservice.model.command.questionEdit.DeleteAnswerCommand;
 import com.javadevs.testingservice.repository.AnswerRepository;
-import com.javadevs.testingservice.repository.QuestionExamRepository;
 import com.javadevs.testingservice.repository.QuestionRepository;
 import com.javadevs.testingservice.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,7 +30,6 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
     private final SubjectRepository subjectRepository;
-    private final QuestionExamRepository questionExamRepository;
 
     @Transactional
     public Question saveQuestion(CreateQuestionCommand command) {
@@ -72,26 +70,27 @@ public class QuestionService {
         Question q = questionRepository.findById(id)
                 .orElseThrow(() -> new QuestionNotFoundException(id));
 
-        questionExamRepository.softDeleteAllByQuestionId(id);
+        q.getExams().forEach(e -> e.getQuestions().removeIf(qs -> qs.getId() == id));
         questionRepository.deleteById(id);
     }
 
     public Question editQuestionPartially(long id, EditQuestionCommand cmd) {
-        Question s = questionRepository.findByIdWithAnswers(id)
+        Question s = questionRepository.findOneWithAnswersSubject(id)
                 .orElseThrow(() -> new QuestionNotFoundException(id));
 
         Optional.ofNullable(cmd.getSubjectId()).ifPresent(x -> {
-            Subject sub = subjectRepository.findOneWithStudents(x)
+            Subject sub = subjectRepository.findSubjectById(x)
                     .orElseThrow(() -> new SubjectNotFoundException(cmd.getSubjectId()));
             s.setSubject(sub);
         });
         Optional.ofNullable(cmd.getQuestion()).ifPresent(s::setQuestion);;
         s.setVersion(cmd.getVersion());
 
-        questionRepository.saveAndFlush(s);
-        return questionRepository.findByIdWithAnswers(id).get();
+
+        return questionRepository.save(s);
     }
 
+    @Transactional
     public Question addAnswer(AddAnswerCommand cmd) {
         Question q = questionRepository.findOneWithAnswersSubject(cmd.getQuestionId())
                 .orElseThrow(() -> new QuestionNotFoundException(cmd.getQuestionId()));
@@ -101,24 +100,21 @@ public class QuestionService {
         ans.setAnswer(cmd.getAnswer());
         ans.setCorrect(cmd.getCorrect());
 
-        q.addAnswer(ans);
-        q.setVersion(cmd.getVersion());
-        q.setDummy(q.getDummy() + 1);
+        //nie ma szans ze sie powtorzy id, question zarzadza answer
+        q.getAnswers().add(ans);
 
         return questionRepository.save(q);
     }
 
     @Transactional
     public void deleteAnswer(DeleteAnswerCommand cmd) {
-        Question s = questionRepository.findByIdWithAnswers(cmd.getQuestionId())
+        Question q = questionRepository.findOneWithAnswersSubject(cmd.getQuestionId())
                 .orElseThrow(() -> new QuestionNotFoundException(cmd.getQuestionId()));
+        Answer a = answerRepository.findById(cmd.getAnswerId())
+                .orElseThrow(() -> new AnswerWasNotAddedException(cmd.getAnswerId()));
 
-        s.deleteAnswer(cmd.getAnswerId());
-        answerRepository.deleteById(cmd.getAnswerId());
-    }
-
-    @Transactional(readOnly = true)
-    public Set<Question> findQuestionsByIds(Set<Long> ids) {
-        return questionRepository.findQuestionsByIds(ids);
+        q.deleteAnswer(cmd.getAnswerId());
+        //sprawdzone czy ten question mial rzeczywiscie ten answer, oraz zaktualizowany stan
+        answerRepository.delete(a);
     }
 }
