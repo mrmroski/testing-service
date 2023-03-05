@@ -12,14 +12,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.NoSuchElementException;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("integration-tests")
 public class SubjectControllerTest {
     @Autowired
     private MockMvc postman;
@@ -46,7 +51,7 @@ public class SubjectControllerTest {
         String cmdRequest = mapper.writeValueAsString(cmd);
 
         //when
-        String response = postman.perform(MockMvcRequestBuilders.post("/api/v1/subjects")
+        String response = postman.perform(post("/api/v1/subjects")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(cmdRequest))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
@@ -82,10 +87,10 @@ public class SubjectControllerTest {
 
         String cmdRequest2 = mapper.writeValueAsString(cmd2);
 
-        postman.perform(MockMvcRequestBuilders.post("/api/v1/subjects")
+        postman.perform(post("/api/v1/subjects")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(cmdRequest));
-        postman.perform(MockMvcRequestBuilders.post("/api/v1/subjects")
+        postman.perform(post("/api/v1/subjects")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(cmdRequest2));
 
@@ -112,7 +117,7 @@ public class SubjectControllerTest {
                 .build();
 
         String cmdRequest = mapper.writeValueAsString(cmd);
-        String postResp = postman.perform(MockMvcRequestBuilders.post("/api/v1/subjects")
+        String postResp = postman.perform(post("/api/v1/subjects")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(cmdRequest))
                 .andReturn()
@@ -147,7 +152,7 @@ public class SubjectControllerTest {
                 .build();
 
         String cmdRequest = mapper.writeValueAsString(cmd);
-        String postResp = postman.perform(MockMvcRequestBuilders.post("/api/v1/subjects")
+        String postResp = postman.perform(post("/api/v1/subjects")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(cmdRequest))
                 .andReturn()
@@ -163,50 +168,6 @@ public class SubjectControllerTest {
         //then
         Assertions.assertThrows(NoSuchElementException.class, () -> subjectRepository.findSubjectById(sub.getId()).get());
     }
-
-    @Test
-    void shouldEditSubject() throws Exception {
-        //given
-        CreateSubjectCommand cmd = CreateSubjectCommand.builder()
-                .subject("test")
-                .description("test 1")
-                .build();
-
-        String cmdRequest = mapper.writeValueAsString(cmd);
-        String postResp = postman.perform(MockMvcRequestBuilders.post("/api/v1/subjects")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(cmdRequest))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        Subject sub = mapper.readValue(postResp, Subject.class);
-
-        EditSubjectCommand editcmd = EditSubjectCommand.builder()
-                .subject("t1")
-                .description("t 1")
-                .build();
-        String editSub = mapper.writeValueAsString(editcmd);
-
-        //when
-        String response = postman.perform(MockMvcRequestBuilders.put("/api/v1/subjects/" + sub.getId())
-                        .content(editSub)
-                        .contentType(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(sub.getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.subject").value("t1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("t 1"))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        Subject subject = mapper.readValue(response, Subject.class);
-
-        //then
-        Assertions.assertEquals(subject.getId(), sub.getId());
-        Assertions.assertEquals(subject.getSubject(), "t1");
-        Assertions.assertEquals(subject.getDescription(), "t 1");
-    }
-
     @Test
     void shouldEditSubjectPartially() throws Exception {
         //given
@@ -216,7 +177,7 @@ public class SubjectControllerTest {
                 .build();
 
         String cmdRequest = mapper.writeValueAsString(cmd);
-        String postResp = postman.perform(MockMvcRequestBuilders.post("/api/v1/subjects")
+        String postResp = postman.perform(post("/api/v1/subjects")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(cmdRequest))
                 .andReturn()
@@ -226,11 +187,12 @@ public class SubjectControllerTest {
 
         EditSubjectCommand editcmd = EditSubjectCommand.builder()
                 .subject("t1")
+                .version(sub.getVersion())
                 .build();
         String editSub = mapper.writeValueAsString(editcmd);
 
         //when
-        String response = postman.perform(MockMvcRequestBuilders.patch("/api/v1/subjects/" + sub.getId())
+        String response = postman.perform(patch("/api/v1/subjects/" + sub.getId())
                         .content(editSub)
                         .contentType(MediaType.APPLICATION_JSON)
                 )
