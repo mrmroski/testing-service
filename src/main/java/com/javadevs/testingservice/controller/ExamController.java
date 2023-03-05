@@ -17,9 +17,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -54,10 +56,17 @@ public class ExamController {
                 .map(exam -> modelMapper.map(exam, ExamDto.class)), HttpStatus.OK);
     }
 
-    @GetMapping("/accept-request/{examId}")
+    @GetMapping("/{examId}/generator")
     public String sendEmailWithTest(@PathVariable("examId") long examId) throws MessagingException {
         log.info("sendEmailWithTest()");
         examService.sendExam(examId);
         return "Twój test został pomyślnie wysłany na twojego maila. POWODZENIA!";
+    }
+
+    @PostMapping("/{examId}/submit")
+    public String sendTestAnswers(@PathVariable("examId") long examId, @RequestParam Map<String, String> params) {
+        log.info("sendTestAnswers()");
+        examService.checkTest(examId, params);
+        return "Dziękujemy za pomyślne wykonanie testu! Sprawdź skrzynkę pocztową aby poznać swój wynik.";
     }
 }
