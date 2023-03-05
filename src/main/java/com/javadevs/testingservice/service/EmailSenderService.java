@@ -23,6 +23,7 @@ public class EmailSenderService {
 
     private final JavaMailSender javaMailSender;
     private final ExamResultService examResultService;
+    private final ExamService examService;
 
     @Value("${email.subject.test-ready}")
     private String subjectTestReady;
@@ -81,6 +82,7 @@ public class EmailSenderService {
 
     public void sendExamResultToStudent(String email, long examResultId) {
         ExamResult fetchedExamResult = examResultService.findExamResultById(examResultId);
+        //ExamResult fetchedExamResult = examService.findExamById(examResultId);
         double result = fetchedExamResult.getPercentageResult();
 
         SimpleMailMessage message = new SimpleMailMessage();

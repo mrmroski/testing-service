@@ -11,20 +11,23 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.Version;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -34,10 +37,11 @@ import java.util.Set;
 @Entity(name = "Exam")
 @Table(name = "exams")
 @Builder
-@SQLDelete(sql = "UPDATE exams SET deleted = true WHERE exam_id=?")
-@Where(clause = "deleted=false")
 @ToString(exclude = {"student", "questions"})
 @EqualsAndHashCode(exclude = {"student", "questions"})
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER)
+@DiscriminatorValue(value = "2")
 public class Exam {
 
     @Id
@@ -48,8 +52,6 @@ public class Exam {
     private long id;
     private LocalDate createdAt;
     private String description;
-
-    private boolean deleted;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "student_id",

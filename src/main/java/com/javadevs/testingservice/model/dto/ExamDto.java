@@ -1,13 +1,7 @@
 package com.javadevs.testingservice.model.dto;
 
 import com.javadevs.testingservice.model.Exam;
-import liquibase.pro.packaged.E;
-import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.Value;
-import org.springframework.hateoas.RepresentationModel;
 
 import java.time.LocalDate;
 import java.util.Set;

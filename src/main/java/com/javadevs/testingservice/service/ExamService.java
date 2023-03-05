@@ -145,9 +145,17 @@ public class ExamService {
         examResult.setPercentageResult(formattedPercentageResult);
         examResult.setTimeSpent(time);
         examResult.setStudent(exam.getStudent());
+        examResult.setCreatedAt(exam.getCreatedAt());
+        examResult.setDescription(exam.getDescription());
+        examResult.setQuestions(exam.getQuestions());
 
-        examResultRepository.save(examResult);
-        sendResult(exam.getId(), examResult.getId());
+        //examResultRepository.save(examResult);
+        //examRepository.save(examResult);
+        Student student = exam.getStudent();
+        examRepository.delete(exam);
+        examRepository.save(examResult);
+
+        sendResult(student.getEmail(), examResult.getId());
 
         log.info("Score is {}% with total of {} answers right and {} answers wrong and time spent of {} minutes",
                 formattedPercentageResult, score, answersSize - score, time);
@@ -159,10 +167,7 @@ public class ExamService {
         return Double.parseDouble(df.format(finalPercentageScore).replace(",", "."));
     }
 
-    private void sendResult(long examId, long examResultId) {
-        Exam fetchedExam = findExamById(examId);
-        String email = fetchedExam.getStudent().getEmail();
-
+    private void sendResult(String email, long examResultId) {
         emailSenderService.sendExamResultToStudent(email, examResultId);
         emailSenderService.sendExamResultToAdmin(email, examResultId);
     }
