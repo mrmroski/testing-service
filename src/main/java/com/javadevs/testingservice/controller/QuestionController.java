@@ -99,7 +99,7 @@ public class QuestionController {
                                           @RequestBody @Valid DeleteAnswerCommand cmd) {
         log.info("deleteAnswer({})", id);
 
-        questionService.deleteAnswer(cmd);
-        return new ResponseEntity<>(HttpStatus.OK);
+        Question q = questionService.deleteAnswer(cmd);
+        return new ResponseEntity<>(modelMapper.map(q, QuestionDto.class),HttpStatus.OK);
     }
 }

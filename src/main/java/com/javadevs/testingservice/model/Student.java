@@ -1,22 +1,18 @@
 package com.javadevs.testingservice.model;
 
-import com.javadevs.testingservice.exception.ExamAlreadyAssignedException;
 import com.javadevs.testingservice.exception.ExamNotFoundException;
 import com.javadevs.testingservice.exception.SubjectIsAlreadyCoveredException;
 import com.javadevs.testingservice.exception.SubjectWasNotCoveredException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -28,8 +24,6 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 //@ToString(exclude = {"subjects", "exams"})
@@ -70,7 +64,6 @@ public class Student {
 
     @Version
     private long version;
-
 
     public void addSubject(Subject other) {
         boolean noneIdMatch = this.subjects.stream()
