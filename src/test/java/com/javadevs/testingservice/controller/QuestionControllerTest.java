@@ -366,9 +366,6 @@ public class QuestionControllerTest {
 
         Question question = mapper.readValue(cqcResponse, Question.class);
 
-        System.out.println("==========================================");
-        System.out.println(question.getSubject());
-
         AddAnswerCommand aac = AddAnswerCommand.builder()
                 .questionId(question.getId())
                 .answer("Bo Peja tak nawinął")
