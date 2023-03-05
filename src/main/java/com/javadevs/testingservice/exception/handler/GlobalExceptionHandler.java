@@ -4,6 +4,7 @@ import com.javadevs.testingservice.exception.AnswerIsAlreadyAddedException;
 import com.javadevs.testingservice.exception.AnswerWasNotAddedException;
 import com.javadevs.testingservice.exception.ExamAlreadyAssignedException;
 import com.javadevs.testingservice.exception.ExamNotFoundException;
+import com.javadevs.testingservice.exception.ExamResultNotFoundException;
 import com.javadevs.testingservice.exception.OptimisticLockException;
 import com.javadevs.testingservice.exception.QuestionNotFoundException;
 import com.javadevs.testingservice.exception.StudentNotFoundException;
@@ -76,6 +77,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(new OptimisticLockBody("ENTITY_DIFFERENT_VERSION", exc.getId(), exc.getCurrentVersion(), exc.getProvidedVersion()));
     }
 
+    @ExceptionHandler(ExamResultNotFoundException.class)
+    public ResponseEntity<ExamResultNotFoundResponseBody> handleExamResultNotFoundException(ExamResultNotFoundException exc) {
+        return ResponseEntity.badRequest().body(new ExamResultNotFoundResponseBody("EXAM_RESULT_NOT_FOUND", exc.getId()));
+    }
+
 
     record QuestionNotFoundResponseBody(String code, Long questionId) {
     }
@@ -105,6 +111,9 @@ public class GlobalExceptionHandler {
     }
 
     record StudentSubjectNotCoveredResponseBody(String code) {
+    }
+
+    record ExamResultNotFoundResponseBody(String code, Long examResultId) {
     }
 
     @Value
