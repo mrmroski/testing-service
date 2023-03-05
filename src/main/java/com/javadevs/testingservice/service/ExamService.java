@@ -163,6 +163,7 @@ public class ExamService {
         Exam fetchedExam = findExamById(examId);
         String email = fetchedExam.getStudent().getEmail();
 
-        emailSenderService.sendExamResult(email, examResultId);
+        emailSenderService.sendExamResultToStudent(email, examResultId);
+        emailSenderService.sendExamResultToAdmin(email, examResultId);
     }
 }

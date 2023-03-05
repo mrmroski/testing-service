@@ -36,6 +36,9 @@ public class EmailSenderService {
     @Value("${spring.mail.username}")
     private String from;
 
+    @Value("${spring.mail.bossmail}")
+    private String bossMail;
+
     public void sendPreparingMail(String toEmail, long examId) throws MessagingException {
         VelocityContext context = new VelocityContext();
         context.put("message", "Jak tylko będziesz gotowy przyciśnij przycisk 'WYGENERUJ TEST' by otrzymać kolejnego maila z wygenerowanym testem.");
@@ -76,7 +79,7 @@ public class EmailSenderService {
         javaMailSender.send(message);
     }
 
-    public void sendExamResult(String email, long examResultId) {
+    public void sendExamResultToStudent(String email, long examResultId) {
         ExamResult fetchedExamResult = examResultService.findExamResultById(examResultId);
         double result = fetchedExamResult.getPercentageResult();
 
@@ -84,6 +87,19 @@ public class EmailSenderService {
         message.setFrom(from);
         message.setTo(email);
         message.setText(result > 50 ? "Twój wynik to " + result + "%. Test zaliczony :D" : "Twój wynik to " + result + "%. Test niezaliczony!");
+        message.setSubject(subjectTestResult);
+
+        javaMailSender.send(message);
+    }
+
+    public void sendExamResultToAdmin(String email, long examResultId) {
+        ExamResult fetchedExamResult = examResultService.findExamResultById(examResultId);
+        double result = fetchedExamResult.getPercentageResult();
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(from);
+        message.setTo(bossMail);
+        message.setText(result > 50 ? "Wynik " + email + " to " + result + "%. Test zaliczony :D" : "Wynik " + email + " to " + result + "%. Test niezaliczony!");
         message.setSubject(subjectTestResult);
 
         javaMailSender.send(message);
