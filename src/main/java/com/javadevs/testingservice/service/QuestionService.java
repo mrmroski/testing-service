@@ -142,6 +142,5 @@ public class QuestionService {
         q.deleteAnswer(cmd.getAnswerId());
         //sprawdzone czy ten question mial rzeczywiscie ten answer, oraz zaktualizowany stan
         answerRepository.delete(a);
-        return q;
     }
 }
