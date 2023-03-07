@@ -74,6 +74,7 @@ public class ExamController {
     @PostMapping("/{examId}/submit")
     public String sendTestAnswers(@PathVariable("examId") long examId, @RequestParam Map<String, String> params) {
         log.info("sendTestAnswers()");
+        System.out.println(params);
         examService.checkTest(examId, params);
         return "Dziękujemy za pomyślne wykonanie testu! Sprawdź skrzynkę pocztową aby poznać swój wynik.";
     }

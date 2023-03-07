@@ -1,11 +1,17 @@
 package com.javadevs.testingservice.controller;
 
 import com.javadevs.testingservice.model.Question;
+import com.javadevs.testingservice.model.QuestionClosed;
+import com.javadevs.testingservice.model.QuestionOpen;
+import com.javadevs.testingservice.model.command.create.CreateQuestionClosedCommand;
 import com.javadevs.testingservice.model.command.create.CreateQuestionCommand;
+import com.javadevs.testingservice.model.command.create.CreateQuestionOpenCommand;
 import com.javadevs.testingservice.model.command.edit.EditQuestionCommand;
 import com.javadevs.testingservice.model.command.questionEdit.AddAnswerCommand;
 import com.javadevs.testingservice.model.command.questionEdit.DeleteAnswerCommand;
+import com.javadevs.testingservice.model.dto.QuestionClosedDto;
 import com.javadevs.testingservice.model.dto.QuestionDto;
+import com.javadevs.testingservice.model.dto.QuestionOpenDto;
 import com.javadevs.testingservice.service.QuestionService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -35,12 +42,22 @@ public class QuestionController {
     private final QuestionService questionService;
     private final ModelMapper modelMapper;
 
-    @PostMapping
-    public ResponseEntity<QuestionDto> saveQuestion(@RequestBody @Valid CreateQuestionCommand command) {
-        log.info("saveQuestion{}", command);
+    @PostMapping("/closed")
+    public ResponseEntity<QuestionDto> saveQuestionClosed(@RequestBody @Valid CreateQuestionClosedCommand command) {
+        log.info("saveQuestionClosed{}", command);
 
         return new ResponseEntity<>(
-                modelMapper.map(questionService.saveQuestion(command), QuestionDto.class),
+                modelMapper.map(questionService.saveQuestionClosed(command), QuestionClosedDto.class),
+                HttpStatus.CREATED
+        );
+    }
+
+    @PostMapping("/open")
+    public ResponseEntity<QuestionDto> saveQuestionOpen(@RequestBody @Valid CreateQuestionOpenCommand command) {
+        log.info("saveQuestionOpened{}", command);
+
+        return new ResponseEntity<>(
+                modelMapper.map(questionService.saveQuestionOpen(command), QuestionOpenDto.class),
                 HttpStatus.CREATED
         );
     }
@@ -48,11 +65,19 @@ public class QuestionController {
     @GetMapping("/{questionId}")
     public ResponseEntity<QuestionDto> findQuestionById(@PathVariable("questionId") long questionId) {
         log.info("findQuestionById({})", questionId);
+        Question q = questionService.findQuestionById(questionId);
 
-        return new ResponseEntity<>(modelMapper
-                .map(questionService.findQuestionById(questionId), QuestionDto.class),
-                HttpStatus.OK
-        );
+        if (q instanceof QuestionOpen) {
+            return new ResponseEntity<>(modelMapper
+                    .map(q, QuestionOpenDto.class),
+                    HttpStatus.OK
+            );
+        } else {
+            return new ResponseEntity<>(modelMapper
+                    .map(q, QuestionClosedDto.class),
+                    HttpStatus.OK
+            );
+        }
     }
 
     @GetMapping
@@ -60,7 +85,13 @@ public class QuestionController {
         log.info("findAllQuestions()");
 
         return new ResponseEntity<>(questionService.findAllQuestions(pageable)
-                .map(question -> modelMapper.map(question, QuestionDto.class)),
+                .map(question -> {
+                    if (question instanceof QuestionClosed) {
+                        return modelMapper.map(question, QuestionClosedDto.class);
+                    } else {
+                        return modelMapper.map(question, QuestionOpenDto.class);
+                    }
+                }),
                 HttpStatus.OK
         );
     }
@@ -79,10 +110,19 @@ public class QuestionController {
                                                              @RequestBody @Valid EditQuestionCommand cmd) {
         log.info("editQuestionPartially({})", id);
 
-        return new ResponseEntity<>(modelMapper
-                .map(questionService.editQuestionPartially(id, cmd), QuestionDto.class),
-                HttpStatus.OK
-        );
+        Question q = questionService.editQuestionPartially(id, cmd);
+
+        if (q instanceof QuestionOpen) {
+            return new ResponseEntity<>(modelMapper
+                    .map(q, QuestionOpenDto.class),
+                    HttpStatus.OK
+            );
+        } else {
+            return new ResponseEntity<>(modelMapper
+                    .map(q, QuestionClosedDto.class),
+                    HttpStatus.OK
+            );
+        }
     }
 
     @PatchMapping("/{questionId}/addAnswer")
@@ -91,7 +131,7 @@ public class QuestionController {
         log.info("addAnswer({})", id);
 
         Question q = questionService.addAnswer(cmd);
-        return new ResponseEntity<>(modelMapper.map(q, QuestionDto.class), HttpStatus.OK);
+        return new ResponseEntity<>(modelMapper.map(q, QuestionClosedDto.class), HttpStatus.OK);
     }
 
     @PatchMapping("/{questionId}/deleteAnswer")

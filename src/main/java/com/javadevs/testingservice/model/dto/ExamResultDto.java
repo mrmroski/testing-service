@@ -1,6 +1,8 @@
 package com.javadevs.testingservice.model.dto;
 
 import com.javadevs.testingservice.model.ExamResult;
+import com.javadevs.testingservice.model.QuestionClosed;
+import com.javadevs.testingservice.model.QuestionOpen;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -25,6 +27,11 @@ public class ExamResultDto {
         this.student = new StudentDto(src.getStudent());
         this.createdAt = src.getCreatedAt();
         this.description = src.getDescription();
-        this.questions = src.getQuestions().stream().map(QuestionDto::new).collect(Collectors.toSet());
-    }
+        this.questions = src.getQuestions().stream().map(q -> {
+            if (q instanceof QuestionClosed) {
+                return new QuestionClosedDto((QuestionClosed) q);
+            } else {
+                return new QuestionOpenDto((QuestionOpen) q);
+            }
+        }).collect(Collectors.toSet());    }
 }

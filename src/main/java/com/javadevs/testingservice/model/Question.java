@@ -13,12 +13,15 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -36,10 +39,12 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity(name = "Question")
 @Table(name = "questions")
-@Builder
+//@Builder
 @SQLDelete(sql = "UPDATE questions SET deleted = true WHERE question_id=? and version=?")
 @Where(clause = "deleted=false")
-public class Question {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn
+public abstract class Question {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "questionSequenceGenerator")
@@ -49,13 +54,10 @@ public class Question {
     private long id;
     private String question;
 
-    @OneToMany(mappedBy = "question", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE})
-    private Set<Answer> answers;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "subject_id")
     private Subject subject;
-
 
     @ManyToMany(mappedBy = "questions", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private Set<Exam> exams;
@@ -64,12 +66,4 @@ public class Question {
 
     @Version
     private long version;
-
-    public void deleteAnswer(Long answerId) {
-        Answer toDelete = this.answers.stream()
-                .filter(curr -> curr.getId() == answerId)
-                .findFirst()
-                .orElseThrow(() -> new AnswerWasNotAddedException(answerId));
-        this.answers.remove(toDelete);
-    }
 }

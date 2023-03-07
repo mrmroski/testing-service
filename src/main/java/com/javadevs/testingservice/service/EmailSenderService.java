@@ -2,6 +2,8 @@ package com.javadevs.testingservice.service;
 
 import com.javadevs.testingservice.model.ExamResult;
 import com.javadevs.testingservice.model.Question;
+import com.javadevs.testingservice.model.QuestionClosed;
+import com.javadevs.testingservice.model.QuestionOpen;
 import lombok.RequiredArgsConstructor;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -16,6 +18,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.StringWriter;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +26,6 @@ public class EmailSenderService {
 
     private final JavaMailSender javaMailSender;
     private final ExamResultService examResultService;
-    private final ExamService examService;
 
     @Value("${email.subject.test-ready}")
     private String subjectTestReady;
@@ -62,7 +64,19 @@ public class EmailSenderService {
 
     public void sendStartOfTestMail(String toEmail, Set<Question> questions, long examId) throws MessagingException {
         VelocityContext context = new VelocityContext();
+
+        Set<QuestionClosed> closed = questions.stream()
+                        .filter(q -> q instanceof QuestionClosed)
+                        .map(q -> (QuestionClosed) q)
+                        .collect(Collectors.toSet());
+        Set<QuestionOpen> open = questions.stream()
+                .filter(q -> q instanceof QuestionOpen)
+                .map(q -> (QuestionOpen) q)
+                .collect(Collectors.toSet());
+
         context.put("questions", questions);
+        context.put("closed", closed);
+        context.put("open", open);
         context.put("examId", examId);
 
         Template template = new VelocityEngine().getTemplate("src/main/resources/emailTemplate/questions.vm");
