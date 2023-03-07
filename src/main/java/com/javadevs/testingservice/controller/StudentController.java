@@ -83,11 +83,11 @@ public class StudentController {
 
     @PatchMapping("/{studentId}/addSubject")
     public ResponseEntity<StudentDto> addSubjectCovered(@PathVariable("studentId") long id,
-                                               @RequestBody @Valid AddSubjectCoveredToStudentCommand cmd) {
+                                                        @RequestBody @Valid AddSubjectCoveredToStudentCommand cmd) {
         log.info("addSubjectCovered({})", id);
 
         var s = studentService.addSubjectCovered(cmd);
-        return new ResponseEntity<>(modelMapper.map(s , StudentDto.class), HttpStatus.OK);
+        return new ResponseEntity<>(modelMapper.map(s, StudentDto.class), HttpStatus.OK);
     }
 
     @PatchMapping("/{studentId}/deleteSubject")

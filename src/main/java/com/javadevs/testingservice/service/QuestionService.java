@@ -127,8 +127,10 @@ public class QuestionService {
     }
 
     @Transactional
+
     public void deleteAnswer(DeleteAnswerCommand cmd) {
         Question qUnk = questionRepository.findOneWithAnswersSubject(cmd.getQuestionId())
+
                 .orElseThrow(() -> new QuestionNotFoundException(cmd.getQuestionId()));
         Answer a = answerRepository.findById(cmd.getAnswerId())
                 .orElseThrow(() -> new AnswerWasNotAddedException(cmd.getAnswerId()));
@@ -140,5 +142,6 @@ public class QuestionService {
         q.deleteAnswer(cmd.getAnswerId());
         //sprawdzone czy ten question mial rzeczywiscie ten answer, oraz zaktualizowany stan
         answerRepository.delete(a);
+        return q;
     }
 }

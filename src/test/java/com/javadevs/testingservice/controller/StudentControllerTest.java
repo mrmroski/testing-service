@@ -11,7 +11,7 @@ import com.javadevs.testingservice.model.command.studentEdit.AddSubjectCoveredTo
 import com.javadevs.testingservice.model.command.studentEdit.DeleteSubjectCoveredFromStudentCommand;
 import com.javadevs.testingservice.repository.StudentRepository;
 import com.javadevs.testingservice.repository.SubjectRepository;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,17 +23,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.util.HashSet;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = TestingServiceApplication.class)
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles("integration-tests")
 class StudentControllerTest {
 
     @Autowired
@@ -48,13 +44,8 @@ class StudentControllerTest {
     @Autowired
     private MockMvc postman;
 
-//    @AfterEach
-//    void tearDown() throws LiquibaseException {
-//        databaseCleaner.cleanUp();
-//    }
-
-    @AfterEach
-    void tearDown() {
+    @BeforeEach
+    void clean() {
         studentRepository.deleteAll();
         subjectRepository.deleteAll();
     }
@@ -147,11 +138,13 @@ class StudentControllerTest {
         Student savedStudent = studentRepository.save(student);
 
         EditStudentCommand command = EditStudentCommand.builder()
-                .lastname("Blaszczykowski").build();
+                .lastname("Blaszczykowski")
+                .version(savedStudent.getVersion())
+                .build();
 
         String commandString = mapper.writeValueAsString(command);
 
-        postman.perform(put("/api/v1/students/" + savedStudent.getId())
+        postman.perform(patch("/api/v1/students/" + savedStudent.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(commandString))
                 .andExpect(status().isOk());
