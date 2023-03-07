@@ -4,15 +4,29 @@
 <form method="POST" action="http://localhost:8080/api/v1/exams/${id}/submit">
     #set ($questionIndex = 1)
 
-    #foreach ($question in $questions)
+    #foreach ($opn in $open)
         <tr>
-            <p>$questionIndex. $question.question</p>
+            <p>$questionIndex. $opn.question</p>
             <label>
-                <textarea name="answer_$questionIndex" rows="5" cols="50"></textarea>
+                <textarea name="$opn.id" rows="5" cols="50"></textarea>
             </label>
             <br><br>
         </tr>
         #set ($questionIndex = $questionIndex + 1)
+    #end
+    #foreach ($cls in $closed)
+        #set ($cid = $cls.id)
+            <tr>
+                <p>$questionIndex. $cls.question</p>
+                #foreach ($ans in $cls.answers)
+                    #set ($aid = $ans.id)
+                    <input type="checkbox" name="$cid-$aid" value=$ans.answer>
+                    <label for="$cid-$aid">$ans.answer</label>
+                    <br><br>
+                #end
+                <br><br>
+            </tr>
+            #set ($questionIndex = $questionIndex + 1)
     #end
     <tr>
         <td colspan="2"><input type="submit" value="Prześlij rozwiązanie"></td>

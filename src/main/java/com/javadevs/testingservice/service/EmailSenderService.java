@@ -2,6 +2,8 @@ package com.javadevs.testingservice.service;
 
 import com.javadevs.testingservice.model.ExamResult;
 import com.javadevs.testingservice.model.Question;
+import com.javadevs.testingservice.model.QuestionClosed;
+import com.javadevs.testingservice.model.QuestionOpen;
 import lombok.RequiredArgsConstructor;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -16,6 +18,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.StringWriter;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +38,9 @@ public class EmailSenderService {
 
     @Value("${spring.mail.username}")
     private String from;
+
+    @Value("${spring.mail.bossmail}")
+    private String bossMail;
 
     public void sendPreparingMail(String toEmail, long examId) throws MessagingException {
         VelocityContext context = new VelocityContext();
@@ -58,7 +64,19 @@ public class EmailSenderService {
 
     public void sendStartOfTestMail(String toEmail, Set<Question> questions, long examId) throws MessagingException {
         VelocityContext context = new VelocityContext();
+
+        Set<QuestionClosed> closed = questions.stream()
+                        .filter(q -> q instanceof QuestionClosed)
+                        .map(q -> (QuestionClosed) q)
+                        .collect(Collectors.toSet());
+        Set<QuestionOpen> open = questions.stream()
+                .filter(q -> q instanceof QuestionOpen)
+                .map(q -> (QuestionOpen) q)
+                .collect(Collectors.toSet());
+
         context.put("questions", questions);
+        context.put("closed", closed);
+        context.put("open", open);
         context.put("examId", examId);
 
         Template template = new VelocityEngine().getTemplate("src/main/resources/emailTemplate/questions.vm");
@@ -76,14 +94,28 @@ public class EmailSenderService {
         javaMailSender.send(message);
     }
 
-    public void sendExamResult(String email, long examResultId) {
+    public void sendExamResultToStudent(String email, long examResultId) {
         ExamResult fetchedExamResult = examResultService.findExamResultById(examResultId);
+        //ExamResult fetchedExamResult = examService.findExamById(examResultId);
         double result = fetchedExamResult.getPercentageResult();
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(from);
         message.setTo(email);
         message.setText(result > 50 ? "Twój wynik to " + result + "%. Test zaliczony :D" : "Twój wynik to " + result + "%. Test niezaliczony!");
+        message.setSubject(subjectTestResult);
+
+        javaMailSender.send(message);
+    }
+
+    public void sendExamResultToAdmin(String email, long examResultId) {
+        ExamResult fetchedExamResult = examResultService.findExamResultById(examResultId);
+        double result = fetchedExamResult.getPercentageResult();
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(from);
+        message.setTo(bossMail);
+        message.setText(result > 50 ? "Wynik " + email + " to " + result + "%. Test zaliczony :D" : "Wynik " + email + " to " + result + "%. Test niezaliczony!");
         message.setSubject(subjectTestResult);
 
         javaMailSender.send(message);

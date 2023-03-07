@@ -7,11 +7,12 @@ import com.javadevs.testingservice.model.Answer;
 import com.javadevs.testingservice.model.Exam;
 import com.javadevs.testingservice.model.ExamResult;
 import com.javadevs.testingservice.model.Question;
+import com.javadevs.testingservice.model.QuestionClosed;
+import com.javadevs.testingservice.model.QuestionOpen;
 import com.javadevs.testingservice.model.Student;
 import com.javadevs.testingservice.model.Subject;
 import com.javadevs.testingservice.model.command.create.CreateExamCommand;
 import com.javadevs.testingservice.repository.ExamRepository;
-import com.javadevs.testingservice.repository.ExamResultRepository;
 import com.javadevs.testingservice.repository.QuestionRepository;
 import com.javadevs.testingservice.repository.StudentRepository;
 import lombok.Getter;
@@ -29,8 +30,10 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 @Slf4j
@@ -41,7 +44,6 @@ public class ExamService {
     private final ExamRepository examRepository;
     private final QuestionRepository questionRepository;
     private final StudentRepository studentRepository;
-    private final ExamResultRepository examResultRepository;
     private final EmailSenderService emailSenderService;
 
     @Getter
@@ -109,32 +111,67 @@ public class ExamService {
     public void checkTest(long examId, Map<String, String> params) {
         setEndTime(LocalDateTime.now());
 
-        List<String> answers = new ArrayList<>();
+        Map<Long, String> openQuestions = new HashMap<>();
+        Map<Long, List<Long>> closedQuestions = new HashMap<>();
+
         for (Map.Entry<String, String> entry : params.entrySet()) {
-            if (entry.getKey().startsWith("answer_")) {
-                answers.add(entry.getValue());
+            if (entry.getKey().contains("-")) {
+                String[] spl = entry.getKey().split("-");
+                Long qid = Long.parseLong(spl[0]);
+                Long aid = Long.parseLong(spl[1]);
+
+                if (closedQuestions.containsKey(qid)) {
+                    List<Long> ids = closedQuestions.getOrDefault(qid, new ArrayList<>());
+                    ids.add(aid);
+                    closedQuestions.put(qid, ids);
+                } else {
+                    List<Long> ids = new ArrayList<>();
+                    ids.add(aid);
+                    closedQuestions.put(qid, ids);
+                }
+            } else {
+                Long qid = Long.parseLong(entry.getKey());
+                String answer = entry.getValue();
+                openQuestions.put(qid, answer);
             }
         }
 
         Exam fetchedExam = findExamById(examId);
         Set<Question> questions = fetchedExam.getQuestions();
-        List<Question> questionList = new ArrayList<>(questions);
         int score = 0;
 
-        for (int i = 0; i < questionList.size(); i++) {
-            String userAnswer = answers.get(i);
-            List<String> correctAnswers = questionList.get(i).getAnswers()
-                    .stream()
-                    .filter(Answer::getCorrect)
-                    .map(Answer::getAnswer)
-                    .toList();
+        for (Question q : questions) {
+            if (openQuestions.containsKey(q.getId())) {
+                QuestionOpen opn = (QuestionOpen) q;
+                String correct = opn.getAnswer();
+                String given = openQuestions.get(q.getId());
 
-            if (correctAnswers.contains(userAnswer)) {
-                score++;
+                if (Objects.equals(correct, given)) {
+                    score += 1;
+                }
+            }
+
+            if (closedQuestions.containsKey(q.getId())) {
+                QuestionClosed cls = (QuestionClosed) q;
+                int allCorrect = 0;
+                int providedCorrect = 0;
+                for (Answer a : cls.getAnswers()) {
+                    if (a.getCorrect()) {
+                        if (closedQuestions.get(q.getId()).contains(a.getId())) {
+                            providedCorrect += 1;
+                        }
+                        allCorrect += 1;
+                    }
+                }
+                if (allCorrect == providedCorrect) {
+                    if (providedCorrect == closedQuestions.get(q.getId()).size()) {
+                        score += 1;
+                    }
+                }
             }
         }
 
-        saveExamResultToDB(fetchedExam, answers.size(), score);
+        saveExamResultToDB(fetchedExam, fetchedExam.getQuestions().size(), score);
     }
 
     private void saveExamResultToDB(Exam exam, int answersSize, int score) {
@@ -145,9 +182,17 @@ public class ExamService {
         examResult.setPercentageResult(formattedPercentageResult);
         examResult.setTimeSpent(time);
         examResult.setStudent(exam.getStudent());
+        examResult.setCreatedAt(exam.getCreatedAt());
+        examResult.setDescription(exam.getDescription());
+        examResult.setQuestions(exam.getQuestions());
 
-        examResultRepository.save(examResult);
-        sendResult(exam.getId(), examResult.getId());
+        //examResultRepository.save(examResult);
+        //examRepository.save(examResult);
+        Student student = exam.getStudent();
+        examRepository.delete(exam);
+        examRepository.save(examResult);
+
+        sendResult(student.getEmail(), examResult.getId());
 
         log.info("Score is {}% with total of {} answers right and {} answers wrong and time spent of {} minutes",
                 formattedPercentageResult, score, answersSize - score, time);
@@ -159,10 +204,8 @@ public class ExamService {
         return Double.parseDouble(df.format(finalPercentageScore).replace(",", "."));
     }
 
-    private void sendResult(long examId, long examResultId) {
-        Exam fetchedExam = findExamById(examId);
-        String email = fetchedExam.getStudent().getEmail();
-
-        emailSenderService.sendExamResult(email, examResultId);
+    private void sendResult(String email, long examResultId) {
+        emailSenderService.sendExamResultToStudent(email, examResultId);
+        emailSenderService.sendExamResultToAdmin(email, examResultId);
     }
 }

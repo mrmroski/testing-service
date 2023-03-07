@@ -5,8 +5,11 @@ import com.javadevs.testingservice.exception.QuestionNotFoundException;
 import com.javadevs.testingservice.exception.SubjectNotFoundException;
 import com.javadevs.testingservice.model.Answer;
 import com.javadevs.testingservice.model.Question;
+import com.javadevs.testingservice.model.QuestionClosed;
+import com.javadevs.testingservice.model.QuestionOpen;
 import com.javadevs.testingservice.model.Subject;
-import com.javadevs.testingservice.model.command.create.CreateQuestionCommand;
+import com.javadevs.testingservice.model.command.create.CreateQuestionClosedCommand;
+import com.javadevs.testingservice.model.command.create.CreateQuestionOpenCommand;
 import com.javadevs.testingservice.model.command.edit.EditQuestionCommand;
 import com.javadevs.testingservice.model.command.questionEdit.AddAnswerCommand;
 import com.javadevs.testingservice.model.command.questionEdit.DeleteAnswerCommand;
@@ -32,11 +35,24 @@ public class QuestionService {
     private final SubjectRepository subjectRepository;
 
     @Transactional
-    public Question saveQuestion(CreateQuestionCommand command) {
+    public Question saveQuestionOpen(CreateQuestionOpenCommand command) {
         Subject subject = subjectRepository.findSubjectById(command.getSubjectId())
                 .orElseThrow(() -> new SubjectNotFoundException(command.getSubjectId()));
 
-        Question q = new Question();
+        QuestionOpen q = new QuestionOpen();
+        q.setQuestion(command.getQuestion());
+        q.setSubject(subject);
+        q.setAnswer(command.getAnswer());
+
+        return questionRepository.save(q);
+    }
+
+    @Transactional
+    public Question saveQuestionClosed(CreateQuestionClosedCommand command) {
+        Subject subject = subjectRepository.findSubjectById(command.getSubjectId())
+                .orElseThrow(() -> new SubjectNotFoundException(command.getSubjectId()));
+
+        QuestionClosed q = new QuestionClosed();
         q.setQuestion(command.getQuestion());
         q.setSubject(subject);
 
@@ -92,8 +108,12 @@ public class QuestionService {
 
     @Transactional
     public Question addAnswer(AddAnswerCommand cmd) {
-        Question q = questionRepository.findOneWithAnswersSubject(cmd.getQuestionId())
+        Question qUnk = questionRepository.findOneWithAnswersSubject(cmd.getQuestionId())
                 .orElseThrow(() -> new QuestionNotFoundException(cmd.getQuestionId()));
+        if (qUnk instanceof QuestionOpen) {
+            throw new QuestionNotFoundException(cmd.getQuestionId());
+        }
+        QuestionClosed q = (QuestionClosed) qUnk;
 
         Answer ans = new Answer();
         ans.setQuestion(q);
@@ -107,12 +127,18 @@ public class QuestionService {
     }
 
     @Transactional
-    public Question deleteAnswer(DeleteAnswerCommand cmd) {
-        Question q = questionRepository.findOneWithAnswersSubject(cmd.getQuestionId())
+
+    public void deleteAnswer(DeleteAnswerCommand cmd) {
+        Question qUnk = questionRepository.findOneWithAnswersSubject(cmd.getQuestionId())
+
                 .orElseThrow(() -> new QuestionNotFoundException(cmd.getQuestionId()));
         Answer a = answerRepository.findById(cmd.getAnswerId())
                 .orElseThrow(() -> new AnswerWasNotAddedException(cmd.getAnswerId()));
 
+        if (qUnk instanceof QuestionOpen) {
+            throw new QuestionNotFoundException(cmd.getQuestionId());
+        }
+        QuestionClosed q = (QuestionClosed) qUnk;
         q.deleteAnswer(cmd.getAnswerId());
         //sprawdzone czy ten question mial rzeczywiscie ten answer, oraz zaktualizowany stan
         answerRepository.delete(a);
