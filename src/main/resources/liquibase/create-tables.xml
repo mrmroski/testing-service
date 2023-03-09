@@ -11,8 +11,9 @@
             create sequence student_sequence_generator start with 100 increment by 100;
             create sequence subject_sequence_generator start with 100 increment by 100;
             create sequence exams_sequence_generator start with 100 increment by 100;
---             create sequence exam_results_sequence_generator start with 100 increment by 100;
+            create sequence results_sequence_generator start with 100 increment by 100;
 
+            create table results (result_id bigint not null, percentage_result double precision not null, time_spent bigint not null, exam_id bigint not null, try_number bigint not null, primary key (result_id));
             create table answers (answer_id bigint not null, answer varchar(255), correct boolean, question_id bigint,
                 primary key (answer_id), deleted boolean not null);
             create table questions (question_id bigint not null, question varchar(255),
@@ -24,10 +25,7 @@
             create table subjects (subject_id bigint not null, description varchar(255), subject varchar(255),
                 primary key (subject_id), deleted boolean not null, version bigint not null);
             create table exam_question (exam_id bigint not null, question_id bigint not null, primary key (exam_id, question_id));
-            create table exams (exam_id bigint not null, created_at date, description varchar(255), student_id bigint,
-            percentage_result double precision, time_spent bigint, DTYPE integer not null, primary key (exam_id));
---             create table exam_results (exam_result_id bigint not null, percentage_result double precision, time_spent bigint,
---                 deleted boolean not null, student_id bigint, primary key (exam_result_id));
+            create table exams (exam_id bigint not null, created_at date, description varchar(255), student_id bigint, primary key (exam_id));
 
         </sql>
 

@@ -3,9 +3,11 @@ package com.javadevs.testingservice.model.dto;
 import com.javadevs.testingservice.model.Exam;
 import com.javadevs.testingservice.model.QuestionClosed;
 import com.javadevs.testingservice.model.QuestionOpen;
+import com.javadevs.testingservice.model.Result;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -17,6 +19,7 @@ public class ExamDto {
     private LocalDate createdAt;
     private String description;
     private Set<QuestionDto> questions;
+    private Set<ResultDto> results;
 
     public ExamDto(Exam src) {
         this.id = src.getId();
@@ -30,5 +33,11 @@ public class ExamDto {
                 return new QuestionOpenDto((QuestionOpen) q);
             }
         }).collect(Collectors.toSet());
+
+        if (src.getResults() != null) {
+            this.results = src.getResults().stream().map(ResultDto::new).collect(Collectors.toSet());
+        } else {
+            this.results = new HashSet<>();
+        }
     }
 }

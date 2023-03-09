@@ -5,10 +5,10 @@ import com.javadevs.testingservice.exception.StudentSubjectsNotCoveredException;
 import com.javadevs.testingservice.exception.SubjectNotFoundException;
 import com.javadevs.testingservice.model.Answer;
 import com.javadevs.testingservice.model.Exam;
-import com.javadevs.testingservice.model.ExamResult;
 import com.javadevs.testingservice.model.Question;
 import com.javadevs.testingservice.model.QuestionClosed;
 import com.javadevs.testingservice.model.QuestionOpen;
+import com.javadevs.testingservice.model.Result;
 import com.javadevs.testingservice.model.Student;
 import com.javadevs.testingservice.model.Subject;
 import com.javadevs.testingservice.model.command.create.CreateExamCommand;
@@ -178,21 +178,18 @@ public class ExamService {
         long time = Duration.between(startTime, endTime).toMinutes();
         double formattedPercentageResult = getFormattedPercentageResult(score, answersSize);
 
-        ExamResult examResult = new ExamResult();
-        examResult.setPercentageResult(formattedPercentageResult);
-        examResult.setTimeSpent(time);
-        examResult.setStudent(exam.getStudent());
-        examResult.setCreatedAt(exam.getCreatedAt());
-        examResult.setDescription(exam.getDescription());
-        examResult.setQuestions(exam.getQuestions());
+        Result result = Result.builder()
+                .percentageResult(formattedPercentageResult)
+                .timeSpent(time)
+                .tryNumber(exam.getResults().size() + 1)
+                .build();
+        exam.getResults().add(result);
+        result.setExam(exam);
 
-        //examResultRepository.save(examResult);
-        //examRepository.save(examResult);
         Student student = exam.getStudent();
-        examRepository.delete(exam);
-        examRepository.save(examResult);
+        examRepository.save(exam);
 
-        sendResult(student.getEmail(), examResult.getId());
+        sendResult(student.getEmail(), exam.getId());
 
         log.info("Score is {}% with total of {} answers right and {} answers wrong and time spent of {} minutes",
                 formattedPercentageResult, score, answersSize - score, time);

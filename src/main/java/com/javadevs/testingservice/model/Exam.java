@@ -26,6 +26,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.time.LocalDate;
@@ -39,9 +40,6 @@ import java.util.Set;
 @Builder
 @ToString(exclude = {"student", "questions"})
 @EqualsAndHashCode(exclude = {"student", "questions"})
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER)
-@DiscriminatorValue(value = "2")
 public class Exam {
 
     @Id
@@ -67,4 +65,7 @@ public class Exam {
             inverseJoinColumns = @JoinColumn(name = "question_id")
     )
     private Set<Question> questions;
+
+    @OneToMany(mappedBy = "exam", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    private Set<Result> results;
 }

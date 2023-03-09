@@ -1,9 +1,11 @@
 package com.javadevs.testingservice.service;
 
-import com.javadevs.testingservice.model.ExamResult;
+import com.javadevs.testingservice.exception.ExamNotFoundException;
+import com.javadevs.testingservice.model.Exam;
 import com.javadevs.testingservice.model.Question;
 import com.javadevs.testingservice.model.QuestionClosed;
 import com.javadevs.testingservice.model.QuestionOpen;
+import com.javadevs.testingservice.repository.ExamRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -25,7 +27,7 @@ import java.util.stream.Collectors;
 public class EmailSenderService {
 
     private final JavaMailSender javaMailSender;
-    private final ExamResultService examResultService;
+    private final ExamRepository examRepository;
 
     @Value("${email.subject.test-ready}")
     private String subjectTestReady;
@@ -95,9 +97,13 @@ public class EmailSenderService {
     }
 
     public void sendExamResultToStudent(String email, long examResultId) {
-        ExamResult fetchedExamResult = examResultService.findExamResultById(examResultId);
-        //ExamResult fetchedExamResult = examService.findExamById(examResultId);
-        double result = fetchedExamResult.getPercentageResult();
+        Exam fetchedExamResult = examRepository.findExamById(examResultId).
+                orElseThrow(() -> new ExamNotFoundException(examResultId));
+        double result = fetchedExamResult.getResults().stream()
+                .filter(r -> r.getTryNumber() == fetchedExamResult.getResults().size())
+                .findFirst()
+                .get()
+                .getPercentageResult();
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(from);
@@ -109,8 +115,13 @@ public class EmailSenderService {
     }
 
     public void sendExamResultToAdmin(String email, long examResultId) {
-        ExamResult fetchedExamResult = examResultService.findExamResultById(examResultId);
-        double result = fetchedExamResult.getPercentageResult();
+        Exam fetchedExamResult = examRepository.findExamById(examResultId).
+                orElseThrow(() -> new ExamNotFoundException(examResultId));
+        double result = fetchedExamResult.getResults().stream()
+                .filter(r -> r.getTryNumber() == fetchedExamResult.getResults().size())
+                .findFirst()
+                .get()
+                .getPercentageResult();
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(from);

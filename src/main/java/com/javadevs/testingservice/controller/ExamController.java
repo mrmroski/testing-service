@@ -1,10 +1,7 @@
 package com.javadevs.testingservice.controller;
 
-import com.javadevs.testingservice.model.Exam;
-import com.javadevs.testingservice.model.ExamResult;
 import com.javadevs.testingservice.model.command.create.CreateExamCommand;
 import com.javadevs.testingservice.model.dto.ExamDto;
-import com.javadevs.testingservice.model.dto.ExamResultDto;
 import com.javadevs.testingservice.service.ExamService;
 import javax.mail.MessagingException;
 import lombok.AllArgsConstructor;
@@ -44,16 +41,11 @@ public class ExamController {
     }
 
     @GetMapping("/{examId}")
-    public ResponseEntity<?> findExamById(@PathVariable("examId") long examId) {
+    public ResponseEntity<ExamDto> findExamById(@PathVariable("examId") long examId) {
         log.info("findExamById({})", examId);
-        Exam fetchedExam = examService.findExamById(examId);
-        if (fetchedExam.getClass().equals(ExamResult.class)) {
-            return new ResponseEntity<>(modelMapper
-                    .map(examService.findExamById(examId), ExamResultDto.class), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(modelMapper
-                    .map(examService.findExamById(examId), ExamDto.class), HttpStatus.OK);
-        }
+
+        return new ResponseEntity<>(modelMapper
+                .map(examService.findExamById(examId), ExamDto.class), HttpStatus.OK);
     }
 
     @GetMapping
