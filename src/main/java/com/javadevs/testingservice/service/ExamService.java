@@ -108,7 +108,7 @@ public class ExamService {
     }
 
     @Transactional
-    public void checkTest(long examId, Map<String, String> params) {
+    public void checkTest(long examId, Map<String, String> params) throws MessagingException {
         setEndTime(LocalDateTime.now());
 
         Map<Long, String> openQuestions = new HashMap<>();
@@ -174,7 +174,7 @@ public class ExamService {
         saveExamResultToDB(fetchedExam, fetchedExam.getQuestions().size(), score);
     }
 
-    private void saveExamResultToDB(Exam exam, int answersSize, int score) {
+    private void saveExamResultToDB(Exam exam, int answersSize, int score) throws MessagingException {
         long time = Duration.between(startTime, endTime).toMinutes();
         double formattedPercentageResult = getFormattedPercentageResult(score, answersSize);
 
@@ -189,10 +189,7 @@ public class ExamService {
         Student student = exam.getStudent();
         examRepository.save(exam);
 
-        sendResult(student.getEmail(), exam.getId());
-
-        log.info("Score is {}% with total of {} answers right and {} answers wrong and time spent of {} minutes",
-                formattedPercentageResult, score, answersSize - score, time);
+        sendResult(student.getEmail(), exam.getId(), time);
     }
 
     private double getFormattedPercentageResult(int score, int answersSize) {
@@ -201,8 +198,8 @@ public class ExamService {
         return Double.parseDouble(df.format(finalPercentageScore).replace(",", "."));
     }
 
-    private void sendResult(String email, long examResultId) {
+    private void sendResult(String email, long examResultId, long time) throws MessagingException {
         emailSenderService.sendExamResultToStudent(email, examResultId);
-        emailSenderService.sendExamResultToAdmin(email, examResultId);
+        emailSenderService.sendExamResultToAdmin(email, examResultId, time);
     }
 }

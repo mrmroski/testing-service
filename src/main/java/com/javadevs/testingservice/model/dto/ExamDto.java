@@ -3,7 +3,6 @@ package com.javadevs.testingservice.model.dto;
 import com.javadevs.testingservice.model.Exam;
 import com.javadevs.testingservice.model.QuestionClosed;
 import com.javadevs.testingservice.model.QuestionOpen;
-import com.javadevs.testingservice.model.Result;
 import lombok.Data;
 
 import java.time.LocalDate;

@@ -1,6 +1,5 @@
 package com.javadevs.testingservice.model;
 
-import com.javadevs.testingservice.exception.ExamNotFoundException;
 import com.javadevs.testingservice.exception.SubjectIsAlreadyCoveredException;
 import com.javadevs.testingservice.exception.SubjectWasNotCoveredException;
 import lombok.AllArgsConstructor;
@@ -26,8 +25,6 @@ import javax.persistence.Version;
 import java.time.LocalDate;
 import java.util.Set;
 
-//@ToString(exclude = {"subjects", "exams"})
-//@EqualsAndHashCode(exclude = {"subjects", "exams"})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -87,34 +84,6 @@ public class Student {
 
         if (found == null) {
             throw new SubjectWasNotCoveredException(other.getId());
-        }
-    }
-
-    public void assignExam(Exam exam) {
-//        Exam found = null;
-//        for (Exam ss : this.getExams()) {
-//            if (ss.getId() == exam.getId()) {
-//                found = ss;
-//                this.exams.remove(ss);
-//            }
-//        }
-//
-//        if (found == null) {
-//            throw new ExamNotFoundException(exam.getId());
-//        }
-    }
-
-    public void removeExam(Exam exam) {
-        Exam found = null;
-        for (Exam ss : this.getExams()) {
-            if (ss.getId() == exam.getId()) {
-                found = ss;
-                this.exams.remove(ss);
-            }
-        }
-
-        if (found == null) {
-            throw new ExamNotFoundException(exam.getId());
         }
     }
 }

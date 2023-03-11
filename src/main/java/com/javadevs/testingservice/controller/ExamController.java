@@ -3,7 +3,6 @@ package com.javadevs.testingservice.controller;
 import com.javadevs.testingservice.model.command.create.CreateExamCommand;
 import com.javadevs.testingservice.model.dto.ExamDto;
 import com.javadevs.testingservice.service.ExamService;
-import javax.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 import java.util.Map;
 
@@ -64,7 +64,7 @@ public class ExamController {
     }
 
     @PostMapping("/{examId}/submit")
-    public String sendTestAnswers(@PathVariable("examId") long examId, @RequestParam Map<String, String> params) {
+    public String sendTestAnswers(@PathVariable("examId") long examId, @RequestParam Map<String, String> params) throws MessagingException {
         log.info("sendTestAnswers()");
         System.out.println(params);
         examService.checkTest(examId, params);

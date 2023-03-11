@@ -11,7 +11,6 @@ public class StudentToStudentDtoConverter implements Converter<Student, StudentD
     @Override
     public StudentDto convert(MappingContext<Student, StudentDto> mappingContext) {
         Student student = mappingContext.getSource();
-
         return new StudentDto(student);
     }
 }

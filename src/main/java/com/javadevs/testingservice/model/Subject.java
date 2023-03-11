@@ -1,6 +1,5 @@
 package com.javadevs.testingservice.model;
 
-import com.javadevs.testingservice.exception.SubjectIsAlreadyCoveredException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,8 +15,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
@@ -46,7 +43,6 @@ public class Subject {
     private String subject;
     private String description;
 
-
     @ManyToMany(mappedBy = "subjects", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private Set<Student> students;
 
@@ -58,14 +54,4 @@ public class Subject {
     @Version
     private long version;
 
-//    public void addStudent(Student other) {
-//        boolean noneIdMatch = this.students.stream()
-//                .noneMatch(curr -> curr.getId() == other.getId());
-//
-//        if (noneIdMatch) {
-//            this.students.add(other);
-//        } else {
-//            throw new SubjectIsAlreadyCoveredException(other.getId());
-//        }
-//    }
 }

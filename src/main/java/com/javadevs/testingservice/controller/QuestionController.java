@@ -4,7 +4,6 @@ import com.javadevs.testingservice.model.Question;
 import com.javadevs.testingservice.model.QuestionClosed;
 import com.javadevs.testingservice.model.QuestionOpen;
 import com.javadevs.testingservice.model.command.create.CreateQuestionClosedCommand;
-import com.javadevs.testingservice.model.command.create.CreateQuestionCommand;
 import com.javadevs.testingservice.model.command.create.CreateQuestionOpenCommand;
 import com.javadevs.testingservice.model.command.edit.EditQuestionCommand;
 import com.javadevs.testingservice.model.command.questionEdit.AddAnswerCommand;
@@ -31,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.Set;
 
 @Slf4j
 @RestController
@@ -105,7 +103,6 @@ public class QuestionController {
     }
 
     @PatchMapping("/{questionId}")
-    //bez @valid by w commandzie moglt byc nulle
     public ResponseEntity<QuestionDto> editQuestionPartially(@PathVariable("questionId") long id,
                                                              @RequestBody @Valid EditQuestionCommand cmd) {
         log.info("editQuestionPartially({})", id);
@@ -127,7 +124,7 @@ public class QuestionController {
 
     @PatchMapping("/{questionId}/addAnswer")
     public ResponseEntity<QuestionDto> addAnswer(@PathVariable("questionId") long id,
-                                       @RequestBody @Valid AddAnswerCommand cmd) {
+                                                 @RequestBody @Valid AddAnswerCommand cmd) {
         log.info("addAnswer({})", id);
 
         Question q = questionService.addAnswer(cmd);

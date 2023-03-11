@@ -1,21 +1,15 @@
 package com.javadevs.testingservice.repository;
 
-import com.javadevs.testingservice.model.Question;
 import com.javadevs.testingservice.model.Student;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Lock;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
-import javax.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 
 public interface StudentRepository extends JpaRepository<Student, Long> {
-
 
     @Query("SELECT DISTINCT s FROM Student s LEFT JOIN FETCH s.subjects WHERE s.id=?1")
     Optional<Student> findOneWithSubjects(Long id);
@@ -25,7 +19,6 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     @Query("SELECT DISTINCT s FROM Student s WHERE s.id=?1")
     Optional<Student> findOne(long id);
-
 
     @Query(value = "SELECT DISTINCT s FROM Student s LEFT JOIN FETCH s.subjects",
             countQuery = "SELECT COUNT(s) FROM Student s"

@@ -1,9 +1,6 @@
 package com.javadevs.testingservice.model;
 
-import com.javadevs.testingservice.exception.AnswerIsAlreadyAddedException;
-import com.javadevs.testingservice.exception.AnswerWasNotAddedException;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -16,30 +13,26 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import java.util.Set;
 
-@ToString(exclude = {"subject", "exams", "answers"})
-@EqualsAndHashCode(exclude = {"subject", "exams", "answers"})
+@ToString(exclude = {"subject", "exams"})
+@EqualsAndHashCode(exclude = {"subject", "exams"})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "Question")
 @Table(name = "questions")
-//@Builder
 @SQLDelete(sql = "UPDATE questions SET deleted = true WHERE question_id=? and version=?")
 @Where(clause = "deleted=false")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -53,7 +46,6 @@ public abstract class Question {
     @Column(name = "question_id")
     private long id;
     private String question;
-
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "subject_id")

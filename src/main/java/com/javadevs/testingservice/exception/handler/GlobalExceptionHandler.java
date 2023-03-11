@@ -12,8 +12,6 @@ import com.javadevs.testingservice.exception.StudentSubjectsNotCoveredException;
 import com.javadevs.testingservice.exception.SubjectIsAlreadyCoveredException;
 import com.javadevs.testingservice.exception.SubjectNotFoundException;
 import com.javadevs.testingservice.exception.SubjectWasNotCoveredException;
-import lombok.Value;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -116,12 +114,7 @@ public class GlobalExceptionHandler {
     record ExamResultNotFoundResponseBody(String code, Long examResultId) {
     }
 
-    @Value
-    static class OptimisticLockBody {
-        String code;
-        Long id;
-        Long currentVersion;
-        Long providedVersion;
+    record OptimisticLockBody(String code, Long id, Long currentVersion, Long providedVersion) {
     }
 
 }

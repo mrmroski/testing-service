@@ -1,11 +1,9 @@
 package com.javadevs.testingservice.model.dto;
 
 import com.javadevs.testingservice.controller.QuestionController;
-import com.javadevs.testingservice.model.Question;
 import com.javadevs.testingservice.model.QuestionClosed;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.hateoas.RepresentationModel;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,9 +24,9 @@ public class QuestionClosedDto extends QuestionDto {
         this.answers = src.getAnswers().stream().map(AnswerDto::new).collect(Collectors.toSet());
         this.version = src.getVersion();
 
-        this.add(linkTo(methodOn(QuestionController.class).addAnswer(src.getId(),null)).withRel("add-answer"));
-        this.add(linkTo(methodOn(QuestionController.class).deleteAnswer(src.getId(),null)).withRel("delete-answer"));
-        this.add(linkTo(methodOn(QuestionController.class).editQuestionPartially(src.getId(),null)).withRel("edit-question"));
+        this.add(linkTo(methodOn(QuestionController.class).addAnswer(src.getId(), null)).withRel("add-answer"));
+        this.add(linkTo(methodOn(QuestionController.class).deleteAnswer(src.getId(), null)).withRel("delete-answer"));
+        this.add(linkTo(methodOn(QuestionController.class).editQuestionPartially(src.getId(), null)).withRel("edit-question"));
         this.add(linkTo(methodOn(QuestionController.class).deleteQuestionById(src.getId())).withRel("delete-question"));
     }
 }
