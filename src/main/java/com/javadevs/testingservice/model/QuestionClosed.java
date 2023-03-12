@@ -22,8 +22,6 @@ import java.util.Set;
 @DiscriminatorValue("CLOSED")
 @SQLDelete(sql = "UPDATE questions SET deleted = true WHERE question_id=? and version=?")
 @Where(clause = "deleted=false")
-@ToString(exclude = {"answers"})
-@EqualsAndHashCode(exclude = {"answers"})
 public class QuestionClosed extends Question {
     @OneToMany(mappedBy = "question", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE})
     private Set<Answer> answers;

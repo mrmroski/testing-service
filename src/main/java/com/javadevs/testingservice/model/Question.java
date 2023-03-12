@@ -26,8 +26,8 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 import java.util.Set;
 
-@ToString(exclude = {"subject", "exams"})
-@EqualsAndHashCode(exclude = {"subject", "exams"})
+@ToString(exclude = {"subject", "exams", "answers"})
+@EqualsAndHashCode(exclude = {"subject", "exams", "answers"})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

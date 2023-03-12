@@ -20,6 +20,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.StringWriter;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,7 +48,7 @@ public class EmailSenderService {
         helper.setSubject(mailProperties.getTitleReady());
         helper.setText(writer.toString(), true);
 
-        javaMailSender.send(message);
+        CompletableFuture.runAsync(() -> javaMailSender.send(message));
     }
 
     public void sendStartOfTestMail(String toEmail, Set<Question> questions, long examId) throws MessagingException {
@@ -79,7 +80,7 @@ public class EmailSenderService {
         String emailContent = writer.toString();
         helper.setText("Twoje pytania to: \n" + emailContent, true);
 
-        javaMailSender.send(message);
+        CompletableFuture.runAsync(() -> javaMailSender.send(message));
     }
 
     public void sendExamResultToStudent(String email, long examResultId) throws MessagingException {
@@ -91,7 +92,7 @@ public class EmailSenderService {
         message.setText(result > 50 ? "Twój wynik to " + result + "%. Test zaliczony :D" : "Twój wynik to " + result + "%. Test niezaliczony! Podejdź niezwłocznie do poprawki.");
         message.setSubject(mailProperties.getTestResult());
 
-        javaMailSender.send(message);
+        CompletableFuture.runAsync(()->javaMailSender.send(message));
 
         if (result <= 50) {
             sendPreparingMail(email, examResultId);
@@ -107,7 +108,7 @@ public class EmailSenderService {
         message.setText(result > 50 ? "Wynik " + email + " to " + result + "%, czas " + time + " min. Test zaliczony :D" : "Wynik " + email + " to " + result + "%, czas " + time + " min. Test niezaliczony!");
         message.setSubject(mailProperties.getTestResult());
 
-        javaMailSender.send(message);
+        CompletableFuture.runAsync(() -> javaMailSender.send(message));
     }
 
     private double getTestResult(long examResultId) {

@@ -61,4 +61,7 @@ public class Exam {
 
     @OneToMany(mappedBy = "exam", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private Set<Result> results;
+
+    @Column(name = "expired")
+    private boolean expired;
 }

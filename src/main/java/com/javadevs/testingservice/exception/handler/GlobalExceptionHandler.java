@@ -3,6 +3,7 @@ package com.javadevs.testingservice.exception.handler;
 import com.javadevs.testingservice.exception.AnswerIsAlreadyAddedException;
 import com.javadevs.testingservice.exception.AnswerWasNotAddedException;
 import com.javadevs.testingservice.exception.ExamAlreadyAssignedException;
+import com.javadevs.testingservice.exception.ExamExpiredException;
 import com.javadevs.testingservice.exception.ExamNotFoundException;
 import com.javadevs.testingservice.exception.ExamResultNotFoundException;
 import com.javadevs.testingservice.exception.OptimisticLockException;
@@ -80,6 +81,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(new ExamResultNotFoundResponseBody("EXAM_RESULT_NOT_FOUND", exc.getId()));
     }
 
+    @ExceptionHandler(ExamExpiredException.class)
+    public ResponseEntity<ExamExpiredBody> handleExamExpiredException(ExamExpiredException exc) {
+        return ResponseEntity.badRequest().body(new ExamExpiredBody("EXAM_EXPIRED",exc.getId()));
+    }
 
     record QuestionNotFoundResponseBody(String code, Long questionId) {
     }
@@ -115,6 +120,9 @@ public class GlobalExceptionHandler {
     }
 
     record OptimisticLockBody(String code, Long id, Long currentVersion, Long providedVersion) {
+    }
+
+    record ExamExpiredBody(String code, Long id) {
     }
 
 }

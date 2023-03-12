@@ -1,6 +1,8 @@
 package com.javadevs.testingservice.service;
 
+import com.javadevs.testingservice.exception.ExamExpiredException;
 import com.javadevs.testingservice.exception.ExamNotFoundException;
+import com.javadevs.testingservice.exception.StudentNotFoundException;
 import com.javadevs.testingservice.exception.StudentSubjectsNotCoveredException;
 import com.javadevs.testingservice.exception.SubjectNotFoundException;
 import com.javadevs.testingservice.model.Answer;
@@ -57,7 +59,8 @@ public class ExamService {
     @Transactional
     public Exam saveExam(CreateExamCommand command) throws MessagingException {
         Student student = studentRepository.findOneWithSubjects(command.getStudentId())
-                .orElseThrow(() -> new SubjectNotFoundException(command.getStudentId()));
+                .orElseThrow(() -> new StudentNotFoundException(command.getStudentId()));
+        System.out.println(command.getQuestions());
         Set<Question> questions = questionRepository.findQuestionsByIds(command.getQuestions());
 
         int found = 0;
@@ -137,6 +140,10 @@ public class ExamService {
         }
 
         Exam fetchedExam = findExamById(examId);
+        if (fetchedExam.isExpired()) {
+            throw new ExamExpiredException(examId);
+        }
+
         Set<Question> questions = fetchedExam.getQuestions();
         int score = 0;
 
@@ -177,6 +184,10 @@ public class ExamService {
     private void saveExamResultToDB(Exam exam, int answersSize, int score) throws MessagingException {
         long time = Duration.between(startTime, endTime).toMinutes();
         double formattedPercentageResult = getFormattedPercentageResult(score, answersSize);
+
+        if (formattedPercentageResult >= 50) {
+            exam.setExpired(true);
+        }
 
         Result result = Result.builder()
                 .percentageResult(formattedPercentageResult)
