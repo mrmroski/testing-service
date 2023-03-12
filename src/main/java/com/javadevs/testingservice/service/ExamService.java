@@ -1,10 +1,12 @@
 package com.javadevs.testingservice.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.javadevs.testingservice.config.HFProperties;
 import com.javadevs.testingservice.exception.ExamExpiredException;
 import com.javadevs.testingservice.exception.ExamNotFoundException;
 import com.javadevs.testingservice.exception.StudentNotFoundException;
 import com.javadevs.testingservice.exception.StudentSubjectsNotCoveredException;
-import com.javadevs.testingservice.exception.SubjectNotFoundException;
 import com.javadevs.testingservice.model.Answer;
 import com.javadevs.testingservice.model.Exam;
 import com.javadevs.testingservice.model.Question;
@@ -17,9 +19,11 @@ import com.javadevs.testingservice.model.command.create.CreateExamCommand;
 import com.javadevs.testingservice.repository.ExamRepository;
 import com.javadevs.testingservice.repository.QuestionRepository;
 import com.javadevs.testingservice.repository.StudentRepository;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +31,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -35,8 +44,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Service
@@ -47,6 +57,8 @@ public class ExamService {
     private final QuestionRepository questionRepository;
     private final StudentRepository studentRepository;
     private final EmailSenderService emailSenderService;
+    private final HFProperties hfProperties;
+    private final ObjectMapper objectMapper;
 
     @Getter
     @Setter
@@ -145,7 +157,7 @@ public class ExamService {
         }
 
         Set<Question> questions = fetchedExam.getQuestions();
-        int score = 0;
+        AtomicInteger score = new AtomicInteger();
 
         for (Question q : questions) {
             if (openQuestions.containsKey(q.getId())) {
@@ -153,8 +165,8 @@ public class ExamService {
                 String correct = opn.getAnswer();
                 String given = openQuestions.get(q.getId());
 
-                if (Objects.equals(correct, given)) {
-                    score += 1;
+                if (semanticSimilarity(correct, given)) {
+                    score.addAndGet(1);
                 }
             }
 
@@ -172,20 +184,20 @@ public class ExamService {
                 }
                 if (allCorrect == providedCorrect) {
                     if (providedCorrect == closedQuestions.get(q.getId()).size()) {
-                        score += 1;
+                        score.addAndGet(1);
                     }
                 }
             }
         }
 
-        saveExamResultToDB(fetchedExam, fetchedExam.getQuestions().size(), score);
+        saveExamResultToDB(fetchedExam, fetchedExam.getQuestions().size(), score.get());
     }
 
     private void saveExamResultToDB(Exam exam, int answersSize, int score) throws MessagingException {
         long time = Duration.between(startTime, endTime).toMinutes();
         double formattedPercentageResult = getFormattedPercentageResult(score, answersSize);
 
-        if (formattedPercentageResult >= 50) {
+        if (formattedPercentageResult > 50) {
             exam.setExpired(true);
         }
 
@@ -213,4 +225,41 @@ public class ExamService {
         emailSenderService.sendExamResultToStudent(email, examResultId);
         emailSenderService.sendExamResultToAdmin(email, examResultId, time);
     }
+
+    @SneakyThrows
+    private boolean semanticSimilarity(String src, String given) {
+        URL url = new URL("https://api-inference.huggingface.co/models/sentence-transformers/all-mpnet-base-v2");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        String body = objectMapper.writeValueAsString(new Input(src, List.of(given)));
+
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Authorization", "Bearer " + hfProperties.getToken());
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        conn.setDoOutput(true);
+        try (DataOutputStream wr = new DataOutputStream(conn.getOutputStream())) {
+            wr.writeBytes(body);
+            wr.flush();
+        }
+
+        StringBuilder response = new StringBuilder();
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+        }
+
+        List<Double> similarity = objectMapper.readValue(response.toString(), new TypeReference<>(){});
+
+        return similarity.get(0) >= 0.55;
+    }
+}
+
+@Getter
+@Setter
+@AllArgsConstructor
+class Input {
+    private String source_sentence;
+    private List<String> sentences;
 }

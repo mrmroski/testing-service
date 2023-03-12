@@ -4,6 +4,7 @@ import com.javadevs.testingservice.model.command.create.CreateExamCommand;
 import com.javadevs.testingservice.model.dto.ExamDto;
 import com.javadevs.testingservice.service.ExamService;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.mail.MessagingException;
 import javax.validation.Valid;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @RestController
@@ -66,8 +68,14 @@ public class ExamController {
     @PostMapping("/{examId}/submit")
     public String sendTestAnswers(@PathVariable("examId") long examId, @RequestParam Map<String, String> params) throws MessagingException {
         log.info("sendTestAnswers()");
-        System.out.println(params);
-        examService.checkTest(examId, params);
+        CompletableFuture.runAsync(() -> {
+            try {
+                examService.checkTest(examId, params);
+            } catch (MessagingException e) {
+                e.printStackTrace();
+            }
+        });
+
         return "Dziękujemy za pomyślne wykonanie testu! Sprawdź skrzynkę pocztową aby poznać swój wynik.";
     }
 }
