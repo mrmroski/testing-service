@@ -14,7 +14,7 @@ import java.util.Set;
 @Setter
 @ToString
 @Builder
-public class CreateQuestionClosedCommand{
+public class CreateQuestionClosedCommand {
     @NotEmpty(message = "QUESTION_NOT_EMPTY")
     private String question;
     @Positive(message = "SUBJECT_ID_NOT_NEGATIVE")

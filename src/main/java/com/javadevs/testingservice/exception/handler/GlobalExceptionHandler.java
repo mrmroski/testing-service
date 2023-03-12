@@ -3,6 +3,7 @@ package com.javadevs.testingservice.exception.handler;
 import com.javadevs.testingservice.exception.AnswerIsAlreadyAddedException;
 import com.javadevs.testingservice.exception.AnswerWasNotAddedException;
 import com.javadevs.testingservice.exception.ExamAlreadyAssignedException;
+import com.javadevs.testingservice.exception.ExamExpiredException;
 import com.javadevs.testingservice.exception.ExamNotFoundException;
 import com.javadevs.testingservice.exception.ExamResultNotFoundException;
 import com.javadevs.testingservice.exception.OptimisticLockException;
@@ -12,8 +13,6 @@ import com.javadevs.testingservice.exception.StudentSubjectsNotCoveredException;
 import com.javadevs.testingservice.exception.SubjectIsAlreadyCoveredException;
 import com.javadevs.testingservice.exception.SubjectNotFoundException;
 import com.javadevs.testingservice.exception.SubjectWasNotCoveredException;
-import lombok.Value;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -82,6 +81,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(new ExamResultNotFoundResponseBody("EXAM_RESULT_NOT_FOUND", exc.getId()));
     }
 
+    @ExceptionHandler(ExamExpiredException.class)
+    public ResponseEntity<ExamExpiredBody> handleExamExpiredException(ExamExpiredException exc) {
+        return ResponseEntity.badRequest().body(new ExamExpiredBody("EXAM_EXPIRED",exc.getId()));
+    }
 
     record QuestionNotFoundResponseBody(String code, Long questionId) {
     }
@@ -116,12 +119,10 @@ public class GlobalExceptionHandler {
     record ExamResultNotFoundResponseBody(String code, Long examResultId) {
     }
 
-    @Value
-    static class OptimisticLockBody {
-        String code;
-        Long id;
-        Long currentVersion;
-        Long providedVersion;
+    record OptimisticLockBody(String code, Long id, Long currentVersion, Long providedVersion) {
+    }
+
+    record ExamExpiredBody(String code, Long id) {
     }
 
 }

@@ -8,7 +8,6 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -17,6 +16,6 @@ import java.util.Set;
 @DiscriminatorValue("OPEN")
 @SQLDelete(sql = "UPDATE questions SET deleted = true WHERE question_id=? and version=?")
 @Where(clause = "deleted=false")
-public class QuestionOpen extends Question{
+public class QuestionOpen extends Question {
     private String answer;
 }

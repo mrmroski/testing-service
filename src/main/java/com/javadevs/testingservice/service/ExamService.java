@@ -1,6 +1,8 @@
 package com.javadevs.testingservice.service;
 
+import com.javadevs.testingservice.exception.ExamExpiredException;
 import com.javadevs.testingservice.exception.ExamNotFoundException;
+import com.javadevs.testingservice.exception.StudentNotFoundException;
 import com.javadevs.testingservice.exception.StudentSubjectsNotCoveredException;
 import com.javadevs.testingservice.exception.SubjectNotFoundException;
 import com.javadevs.testingservice.model.Answer;
@@ -57,7 +59,8 @@ public class ExamService {
     @Transactional
     public Exam saveExam(CreateExamCommand command) throws MessagingException {
         Student student = studentRepository.findOneWithSubjects(command.getStudentId())
-                .orElseThrow(() -> new SubjectNotFoundException(command.getStudentId()));
+                .orElseThrow(() -> new StudentNotFoundException(command.getStudentId()));
+        System.out.println(command.getQuestions());
         Set<Question> questions = questionRepository.findQuestionsByIds(command.getQuestions());
 
         int found = 0;
@@ -108,7 +111,7 @@ public class ExamService {
     }
 
     @Transactional
-    public void checkTest(long examId, Map<String, String> params) {
+    public void checkTest(long examId, Map<String, String> params) throws MessagingException {
         setEndTime(LocalDateTime.now());
 
         Map<Long, String> openQuestions = new HashMap<>();
@@ -137,6 +140,10 @@ public class ExamService {
         }
 
         Exam fetchedExam = findExamById(examId);
+        if (fetchedExam.isExpired()) {
+            throw new ExamExpiredException(examId);
+        }
+
         Set<Question> questions = fetchedExam.getQuestions();
         int score = 0;
 
@@ -174,9 +181,13 @@ public class ExamService {
         saveExamResultToDB(fetchedExam, fetchedExam.getQuestions().size(), score);
     }
 
-    private void saveExamResultToDB(Exam exam, int answersSize, int score) {
+    private void saveExamResultToDB(Exam exam, int answersSize, int score) throws MessagingException {
         long time = Duration.between(startTime, endTime).toMinutes();
         double formattedPercentageResult = getFormattedPercentageResult(score, answersSize);
+
+        if (formattedPercentageResult >= 50) {
+            exam.setExpired(true);
+        }
 
         Result result = Result.builder()
                 .percentageResult(formattedPercentageResult)
@@ -189,10 +200,7 @@ public class ExamService {
         Student student = exam.getStudent();
         examRepository.save(exam);
 
-        sendResult(student.getEmail(), exam.getId());
-
-        log.info("Score is {}% with total of {} answers right and {} answers wrong and time spent of {} minutes",
-                formattedPercentageResult, score, answersSize - score, time);
+        sendResult(student.getEmail(), exam.getId(), time);
     }
 
     private double getFormattedPercentageResult(int score, int answersSize) {
@@ -201,8 +209,8 @@ public class ExamService {
         return Double.parseDouble(df.format(finalPercentageScore).replace(",", "."));
     }
 
-    private void sendResult(String email, long examResultId) {
+    private void sendResult(String email, long examResultId, long time) throws MessagingException {
         emailSenderService.sendExamResultToStudent(email, examResultId);
-        emailSenderService.sendExamResultToAdmin(email, examResultId);
+        emailSenderService.sendExamResultToAdmin(email, examResultId, time);
     }
 }

@@ -99,7 +99,8 @@ public class QuestionService {
                     .orElseThrow(() -> new SubjectNotFoundException(cmd.getSubjectId()));
             s.setSubject(sub);
         });
-        Optional.ofNullable(cmd.getQuestion()).ifPresent(s::setQuestion);;
+        Optional.ofNullable(cmd.getQuestion()).ifPresent(s::setQuestion);
+        ;
         s.setVersion(cmd.getVersion());
 
 

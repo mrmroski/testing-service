@@ -1,5 +1,6 @@
 package com.javadevs.testingservice.service;
 
+import com.javadevs.testingservice.config.MailProperties;
 import com.javadevs.testingservice.exception.ExamNotFoundException;
 import com.javadevs.testingservice.model.Exam;
 import com.javadevs.testingservice.model.Question;
@@ -10,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -20,6 +20,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.StringWriter;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,21 +29,7 @@ public class EmailSenderService {
 
     private final JavaMailSender javaMailSender;
     private final ExamRepository examRepository;
-
-    @Value("${email.subject.test-ready}")
-    private String subjectTestReady;
-
-    @Value("${email.subject.test-start}")
-    private String subjectTestStart;
-
-    @Value("${email.subject.test-result}")
-    private String subjectTestResult;
-
-    @Value("${spring.mail.username}")
-    private String from;
-
-    @Value("${spring.mail.bossmail}")
-    private String bossMail;
+    private final MailProperties mailProperties;
 
     public void sendPreparingMail(String toEmail, long examId) throws MessagingException {
         VelocityContext context = new VelocityContext();
@@ -57,20 +44,20 @@ public class EmailSenderService {
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
         helper.setTo(toEmail);
-        helper.setFrom(from);
-        helper.setSubject(subjectTestReady);
+        helper.setFrom(mailProperties.getFrom());
+        helper.setSubject(mailProperties.getTitleReady());
         helper.setText(writer.toString(), true);
 
-        javaMailSender.send(message);
+        CompletableFuture.runAsync(() -> javaMailSender.send(message));
     }
 
     public void sendStartOfTestMail(String toEmail, Set<Question> questions, long examId) throws MessagingException {
         VelocityContext context = new VelocityContext();
 
         Set<QuestionClosed> closed = questions.stream()
-                        .filter(q -> q instanceof QuestionClosed)
-                        .map(q -> (QuestionClosed) q)
-                        .collect(Collectors.toSet());
+                .filter(q -> q instanceof QuestionClosed)
+                .map(q -> (QuestionClosed) q)
+                .collect(Collectors.toSet());
         Set<QuestionOpen> open = questions.stream()
                 .filter(q -> q instanceof QuestionOpen)
                 .map(q -> (QuestionOpen) q)
@@ -88,47 +75,49 @@ public class EmailSenderService {
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
         helper.setTo(toEmail);
-        helper.setFrom(from);
-        helper.setSubject(subjectTestStart);
+        helper.setFrom(mailProperties.getFrom());
+        helper.setSubject(mailProperties.getTitleStart());
         String emailContent = writer.toString();
         helper.setText("Twoje pytania to: \n" + emailContent, true);
 
-        javaMailSender.send(message);
+        CompletableFuture.runAsync(() -> javaMailSender.send(message));
     }
 
-    public void sendExamResultToStudent(String email, long examResultId) {
-        Exam fetchedExamResult = examRepository.findExamById(examResultId).
-                orElseThrow(() -> new ExamNotFoundException(examResultId));
-        double result = fetchedExamResult.getResults().stream()
-                .filter(r -> r.getTryNumber() == fetchedExamResult.getResults().size())
-                .findFirst()
-                .get()
-                .getPercentageResult();
+    public void sendExamResultToStudent(String email, long examResultId) throws MessagingException {
+        double result = getTestResult(examResultId);
 
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(from);
+        message.setFrom(mailProperties.getFrom());
         message.setTo(email);
-        message.setText(result > 50 ? "Twój wynik to " + result + "%. Test zaliczony :D" : "Twój wynik to " + result + "%. Test niezaliczony!");
-        message.setSubject(subjectTestResult);
+        message.setText(result > 50 ? "Twój wynik to " + result + "%. Test zaliczony :D" : "Twój wynik to " + result + "%. Test niezaliczony! Podejdź niezwłocznie do poprawki.");
+        message.setSubject(mailProperties.getTestResult());
 
-        javaMailSender.send(message);
+        CompletableFuture.runAsync(()->javaMailSender.send(message));
+
+        if (result <= 50) {
+            sendPreparingMail(email, examResultId);
+        }
     }
 
-    public void sendExamResultToAdmin(String email, long examResultId) {
+    public void sendExamResultToAdmin(String email, long examResultId, long time) {
+        double result = getTestResult(examResultId);
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(mailProperties.getFrom());
+        message.setTo(mailProperties.getAdminMail());
+        message.setText(result > 50 ? "Wynik " + email + " to " + result + "%, czas " + time + " min. Test zaliczony :D" : "Wynik " + email + " to " + result + "%, czas " + time + " min. Test niezaliczony!");
+        message.setSubject(mailProperties.getTestResult());
+
+        CompletableFuture.runAsync(() -> javaMailSender.send(message));
+    }
+
+    private double getTestResult(long examResultId) {
         Exam fetchedExamResult = examRepository.findExamById(examResultId).
                 orElseThrow(() -> new ExamNotFoundException(examResultId));
-        double result = fetchedExamResult.getResults().stream()
+        return fetchedExamResult.getResults().stream()
                 .filter(r -> r.getTryNumber() == fetchedExamResult.getResults().size())
                 .findFirst()
                 .get()
                 .getPercentageResult();
-
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(from);
-        message.setTo(bossMail);
-        message.setText(result > 50 ? "Wynik " + email + " to " + result + "%. Test zaliczony :D" : "Wynik " + email + " to " + result + "%. Test niezaliczony!");
-        message.setSubject(subjectTestResult);
-
-        javaMailSender.send(message);
     }
 }

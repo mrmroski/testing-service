@@ -64,7 +64,6 @@ public class SubjectController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    //bez @valid zeby mogly byc nulle w commandzie
     @PatchMapping("/{subjectId}")
     public ResponseEntity<SubjectDto> editSubjectPartially(@PathVariable("subjectId") long subjectId,
                                                            @RequestBody @Valid EditSubjectCommand cmd) {

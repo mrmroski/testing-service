@@ -6,15 +6,13 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import java.util.Set;
 
 @Getter
 @Setter
 @ToString
 @Builder
-public class CreateQuestionOpenCommand{
+public class CreateQuestionOpenCommand {
     @NotEmpty(message = "QUESTION_NOT_EMPTY")
     private String question;
     @Positive(message = "SUBJECT_ID_NOT_NEGATIVE")
