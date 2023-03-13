@@ -4,7 +4,6 @@ import com.javadevs.testingservice.exception.ExamExpiredException;
 import com.javadevs.testingservice.exception.ExamNotFoundException;
 import com.javadevs.testingservice.exception.StudentNotFoundException;
 import com.javadevs.testingservice.exception.StudentSubjectsNotCoveredException;
-import com.javadevs.testingservice.exception.SubjectNotFoundException;
 import com.javadevs.testingservice.model.Answer;
 import com.javadevs.testingservice.model.Exam;
 import com.javadevs.testingservice.model.Question;
@@ -85,7 +84,7 @@ public class ExamService {
         examRepository.save(exam);
 
         //commented because we don't want to get banned on gmail neither spam on random emails :D
-        emailSenderService.sendPreparingMail(student.getEmail(), exam.getId());
+        //emailSenderService.sendPreparingMail(student.getEmail(), exam.getId());
 
         return exam;
     }
