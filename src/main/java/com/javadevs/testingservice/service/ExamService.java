@@ -4,7 +4,6 @@ import com.javadevs.testingservice.exception.ExamExpiredException;
 import com.javadevs.testingservice.exception.ExamNotFoundException;
 import com.javadevs.testingservice.exception.StudentNotFoundException;
 import com.javadevs.testingservice.exception.StudentSubjectsNotCoveredException;
-import com.javadevs.testingservice.exception.SubjectNotFoundException;
 import com.javadevs.testingservice.model.Answer;
 import com.javadevs.testingservice.model.Exam;
 import com.javadevs.testingservice.model.Question;
