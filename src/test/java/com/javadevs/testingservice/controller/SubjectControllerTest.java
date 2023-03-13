@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -52,6 +53,7 @@ public class SubjectControllerTest {
 
         //when
         String response = postman.perform(post("/api/v1/subjects")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(cmdRequest))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
@@ -88,15 +90,18 @@ public class SubjectControllerTest {
         String cmdRequest2 = mapper.writeValueAsString(cmd2);
 
         postman.perform(post("/api/v1/subjects")
+                .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(cmdRequest));
         postman.perform(post("/api/v1/subjects")
+                .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(cmdRequest2));
 
         //when //then
 
-        postman.perform(MockMvcRequestBuilders.get("/api/v1/subjects"))
+        postman.perform(MockMvcRequestBuilders.get("/api/v1/subjects")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4="))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content.length()").value(2))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id").exists())
@@ -118,6 +123,7 @@ public class SubjectControllerTest {
 
         String cmdRequest = mapper.writeValueAsString(cmd);
         String postResp = postman.perform(post("/api/v1/subjects")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(cmdRequest))
                 .andReturn()
@@ -125,7 +131,8 @@ public class SubjectControllerTest {
                 .getContentAsString();
         Subject sub = mapper.readValue(postResp, Subject.class);
         //when
-        String response = postman.perform(MockMvcRequestBuilders.get("/api/v1/subjects/" + sub.getId()))
+        String response = postman.perform(MockMvcRequestBuilders.get("/api/v1/subjects/" + sub.getId())
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4="))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(sub.getId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.subject").value("test"))
@@ -153,6 +160,7 @@ public class SubjectControllerTest {
 
         String cmdRequest = mapper.writeValueAsString(cmd);
         String postResp = postman.perform(post("/api/v1/subjects")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(cmdRequest))
                 .andReturn()
@@ -162,12 +170,14 @@ public class SubjectControllerTest {
 
         //when
 
-        postman.perform(MockMvcRequestBuilders.delete("/api/v1/subjects/" + sub.getId()))
+        postman.perform(MockMvcRequestBuilders.delete("/api/v1/subjects/" + sub.getId())
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4="))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         //then
         Assertions.assertThrows(NoSuchElementException.class, () -> subjectRepository.findSubjectById(sub.getId()).get());
     }
+
     @Test
     void shouldEditSubjectPartially() throws Exception {
         //given
@@ -178,6 +188,7 @@ public class SubjectControllerTest {
 
         String cmdRequest = mapper.writeValueAsString(cmd);
         String postResp = postman.perform(post("/api/v1/subjects")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(cmdRequest))
                 .andReturn()
@@ -193,6 +204,7 @@ public class SubjectControllerTest {
 
         //when
         String response = postman.perform(patch("/api/v1/subjects/" + sub.getId())
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
                         .content(editSub)
                         .contentType(MediaType.APPLICATION_JSON)
                 )

@@ -1,33 +1,25 @@
 package com.javadevs.testingservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.javadevs.testingservice.model.Answer;
-import com.javadevs.testingservice.model.Question;
 import com.javadevs.testingservice.model.Subject;
 import com.javadevs.testingservice.model.command.create.CreateAnswerCommand;
-import com.javadevs.testingservice.model.command.create.CreateQuestionCommand;
 import com.javadevs.testingservice.model.command.create.CreateSubjectCommand;
-import com.javadevs.testingservice.model.command.questionEdit.AddAnswerCommand;
-import com.javadevs.testingservice.model.command.questionEdit.DeleteAnswerCommand;
 import com.javadevs.testingservice.repository.QuestionRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.NoSuchElementException;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -114,6 +106,7 @@ public class QuestionControllerTest {
         String subjectS = mapper.writeValueAsString(sCmd);
 
         String subResp = postman.perform(MockMvcRequestBuilders.post("/api/v1/subjects")
+                        .header(HttpHeaders.AUTHORIZATION,"Basic YWRtaW46YWRtaW4=")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(subjectS))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
@@ -130,6 +123,7 @@ public class QuestionControllerTest {
         String subjectS2 = mapper.writeValueAsString(sCmd2);
 
         String subResp2 = postman.perform(MockMvcRequestBuilders.post("/api/v1/subjects")
+                        .header(HttpHeaders.AUTHORIZATION,"Basic YWRtaW46YWRtaW4=")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(subjectS2))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
@@ -206,6 +200,7 @@ public class QuestionControllerTest {
         String subjectS = mapper.writeValueAsString(sCmd);
 
         String subResp = postman.perform(MockMvcRequestBuilders.post("/api/v1/subjects")
+                        .header(HttpHeaders.AUTHORIZATION,"Basic YWRtaW46YWRtaW4=")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(subjectS))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
@@ -251,6 +246,7 @@ public class QuestionControllerTest {
         String subjectS = mapper.writeValueAsString(sCmd);
 
         String subResp = postman.perform(MockMvcRequestBuilders.post("/api/v1/subjects")
+                        .header(HttpHeaders.AUTHORIZATION,"Basic YWRtaW46YWRtaW4=")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(subjectS))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
@@ -297,6 +293,7 @@ public class QuestionControllerTest {
         String subjectS = mapper.writeValueAsString(sCmd);
 
         String subResp = postman.perform(MockMvcRequestBuilders.post("/api/v1/subjects")
+                        .header(HttpHeaders.AUTHORIZATION,"Basic YWRtaW46YWRtaW4=")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(subjectS))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
@@ -338,6 +335,7 @@ public class QuestionControllerTest {
         String cscRequest = mapper.writeValueAsString(csc);
 
         String cscResponse = postman.perform(post("/api/v1/subjects")
+                        .header(HttpHeaders.AUTHORIZATION,"Basic YWRtaW46YWRtaW4=")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(cscRequest))
                 .andExpect(status().isCreated())

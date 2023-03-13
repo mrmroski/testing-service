@@ -3,6 +3,7 @@ package com.javadevs.testingservice.service;
 import com.javadevs.testingservice.exception.AnswerWasNotAddedException;
 import com.javadevs.testingservice.exception.QuestionNotFoundException;
 import com.javadevs.testingservice.exception.SubjectNotFoundException;
+import com.javadevs.testingservice.exception.WrongQuestionTypeException;
 import com.javadevs.testingservice.model.Answer;
 import com.javadevs.testingservice.model.Question;
 import com.javadevs.testingservice.model.QuestionClosed;
@@ -35,7 +36,7 @@ public class QuestionService {
     private final SubjectRepository subjectRepository;
 
     @Transactional
-    public Question saveQuestionOpen(CreateQuestionOpenCommand command) {
+    public QuestionOpen saveQuestionOpen(CreateQuestionOpenCommand command) {
         Subject subject = subjectRepository.findSubjectById(command.getSubjectId())
                 .orElseThrow(() -> new SubjectNotFoundException(command.getSubjectId()));
 
@@ -48,7 +49,7 @@ public class QuestionService {
     }
 
     @Transactional
-    public Question saveQuestionClosed(CreateQuestionClosedCommand command) {
+    public QuestionClosed saveQuestionClosed(CreateQuestionClosedCommand command) {
         Subject subject = subjectRepository.findSubjectById(command.getSubjectId())
                 .orElseThrow(() -> new SubjectNotFoundException(command.getSubjectId()));
 
@@ -112,7 +113,7 @@ public class QuestionService {
         Question qUnk = questionRepository.findOneWithAnswersSubject(cmd.getQuestionId())
                 .orElseThrow(() -> new QuestionNotFoundException(cmd.getQuestionId()));
         if (qUnk instanceof QuestionOpen) {
-            throw new QuestionNotFoundException(cmd.getQuestionId());
+            throw new WrongQuestionTypeException(qUnk.getClass().toString());
         }
         QuestionClosed q = (QuestionClosed) qUnk;
 
@@ -137,7 +138,7 @@ public class QuestionService {
                 .orElseThrow(() -> new AnswerWasNotAddedException(cmd.getAnswerId()));
 
         if (qUnk instanceof QuestionOpen) {
-            throw new QuestionNotFoundException(cmd.getQuestionId());
+            throw new WrongQuestionTypeException(qUnk.getClass().toString());
         }
         QuestionClosed q = (QuestionClosed) qUnk;
         q.deleteAnswer(cmd.getAnswerId());
