@@ -49,7 +49,6 @@ public class StudentService {
         Student student = studentRepository.findOneWithExams(id)
                 .orElseThrow(() -> new StudentNotFoundException(id));
 
-
         studentRepository.delete(student);
     }
 
@@ -77,12 +76,13 @@ public class StudentService {
     }
 
     @Transactional
-    public void deleteSubjectCovered(DeleteSubjectCoveredFromStudentCommand cmd) {
+    public Student deleteSubjectCovered(DeleteSubjectCoveredFromStudentCommand cmd) {
         Student student = studentRepository.findOneWithSubjects(cmd.getStudentId())
                 .orElseThrow(() -> new StudentNotFoundException(cmd.getStudentId()));
         Subject subject = subjectRepository.findOneWithStudents(cmd.getSubjectId())
                 .orElseThrow(() -> new SubjectNotFoundException(cmd.getSubjectId()));
 
         student.deleteSubject(subject);
+        return studentRepository.save(student);
     }
 }

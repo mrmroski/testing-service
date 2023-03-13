@@ -76,45 +76,45 @@
 //                CreateAnswerCommand.builder().answer("nie").correct(false).build(),
 //                CreateAnswerCommand.builder().answer("nie wiem").correct(true).build()
 //        );
-////
-////        CreateQuestionCommand cqc1 = CreateQuestionCommand.builder()
-////                .question("kafaj?")
-////                .subjectId(sub.getId())
-////                .answers(createAnswerCommands).build();
-////
-////        CreateQuestionCommand cqc2 = CreateQuestionCommand.builder()
-////                .question("japajos?")
-////                .subjectId(sub.getId())
-////                .answers(createAnswerCommands).build();
-////
-////        String cqc1Request = mapper.writeValueAsString(cqc1);
-////        String cqc2Request = mapper.writeValueAsString(cqc2);
-////
-////        String cqc1Response = postman.perform(post("/api/v1/questions")
-////                        .contentType(APPLICATION_JSON)
-////                        .content(cqc1Request))
-////                .andExpect(status().isCreated())
-////                .andReturn()
-////                .getResponse()
-////                .getContentAsString();
-////
-////        String cqc2Response = postman.perform(post("/api/v1/questions")
-////                        .contentType(APPLICATION_JSON)
-////                        .content(cqc2Request))
-////                .andExpect(status().isCreated())
-////                .andReturn()
-////                .getResponse()
-////                .getContentAsString();
-////
-////        Question question1 = mapper.readValue(cqc1Response, Question.class);
-////        Question question2 = mapper.readValue(cqc2Response, Question.class);
-////
-////        CreateStudentCommand cstudentc = CreateStudentCommand.builder()
-////                .name("Maciej")
-////                .lastname("Rozgocki")
-////                .email("mrozgocki@gmail.com").build();
-////
-////        String cstudentcRequest = mapper.writeValueAsString(cstudentc);
+//
+//        CreateQuestionCommand cqc1 = CreateQuestionCommand.builder()
+//                .question("kafaj?")
+//                .subjectId(sub.getId())
+//                .answers(createAnswerCommands).build();
+//
+//        CreateQuestionCommand cqc2 = CreateQuestionCommand.builder()
+//                .question("japajos?")
+//                .subjectId(sub.getId())
+//                .answers(createAnswerCommands).build();
+//
+//        String cqc1Request = mapper.writeValueAsString(cqc1);
+//        String cqc2Request = mapper.writeValueAsString(cqc2);
+//
+//        String cqc1Response = postman.perform(post("/api/v1/questions")
+//                        .contentType(APPLICATION_JSON)
+//                        .content(cqc1Request))
+//                .andExpect(status().isCreated())
+//                .andReturn()
+//                .getResponse()
+//                .getContentAsString();
+//
+//        String cqc2Response = postman.perform(post("/api/v1/questions")
+//                        .contentType(APPLICATION_JSON)
+//                        .content(cqc2Request))
+//                .andExpect(status().isCreated())
+//                .andReturn()
+//                .getResponse()
+//                .getContentAsString();
+//
+//        Question question1 = mapper.readValue(cqc1Response, Question.class);
+//        Question question2 = mapper.readValue(cqc2Response, Question.class);
+//
+//        CreateStudentCommand cstudentc = CreateStudentCommand.builder()
+//                .name("Maciej")
+//                .lastname("Rozgocki")
+//                .email("mrozgocki@gmail.com").build();
+//
+//        String cstudentcRequest = mapper.writeValueAsString(cstudentc);
 //
 //        String cstudentcResponse = postman.perform(post("/api/v1/students")
 //                        .contentType(APPLICATION_JSON)

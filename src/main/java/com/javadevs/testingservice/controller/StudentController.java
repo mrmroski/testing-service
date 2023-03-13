@@ -95,8 +95,8 @@ public class StudentController {
                                            @RequestBody @Valid DeleteSubjectCoveredFromStudentCommand cmd) {
         log.info("deleteSubject({})", id);
 
-        studentService.deleteSubjectCovered(cmd);
-        return new ResponseEntity<>(HttpStatus.OK);
+        var s = studentService.deleteSubjectCovered(cmd);
+        return new ResponseEntity<>(modelMapper.map(s, StudentDto.class),HttpStatus.OK);
     }
 
 }

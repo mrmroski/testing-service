@@ -13,6 +13,7 @@ import com.javadevs.testingservice.exception.StudentSubjectsNotCoveredException;
 import com.javadevs.testingservice.exception.SubjectIsAlreadyCoveredException;
 import com.javadevs.testingservice.exception.SubjectNotFoundException;
 import com.javadevs.testingservice.exception.SubjectWasNotCoveredException;
+import com.javadevs.testingservice.exception.WrongQuestionTypeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -86,6 +87,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(new ExamExpiredBody("EXAM_EXPIRED",exc.getId()));
     }
 
+    @ExceptionHandler(WrongQuestionTypeException.class)
+    public ResponseEntity<WrongQuestionTypeBody> handleWrongQuestionTypeException(WrongQuestionTypeException exc){
+        return ResponseEntity.badRequest().body(new WrongQuestionTypeBody("WRONG_QUESTION_TYPE",exc.getTypeOfClass()));
+    }
+
     record QuestionNotFoundResponseBody(String code, Long questionId) {
     }
 
@@ -123,6 +129,10 @@ public class GlobalExceptionHandler {
     }
 
     record ExamExpiredBody(String code, Long id) {
+    }
+
+    record WrongQuestionTypeBody(String code,String typeOfClass){
+
     }
 
 }

@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -56,6 +57,7 @@ class StudentControllerTest {
         String commandString = mapper.writeValueAsString(command);
 
         postman.perform(post("/api/v1/students")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(commandString))
                 .andExpect(status().isCreated())
@@ -77,7 +79,8 @@ class StudentControllerTest {
 
         Student savedStudent = studentRepository.save(student);
 
-        postman.perform(get("/api/v1/students/" + savedStudent.getId()))
+        postman.perform(get("/api/v1/students/" + savedStudent.getId())
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4="))
                 .andExpect(jsonPath("$.id").value(savedStudent.getId()))
                 .andExpect(jsonPath("$.name").value("Robert"))
                 .andExpect(jsonPath("$.lastname").value("Lewandowski"))
@@ -97,7 +100,8 @@ class StudentControllerTest {
 
         Student savedStudent = studentRepository.save(student);
 
-        postman.perform(get("/api/v1/students"))
+        postman.perform(get("/api/v1/students")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4="))
                 .andExpect(jsonPath("$.content[0].id").value(savedStudent.getId()))
                 .andExpect(jsonPath("$.content[0].name").value("Robert"))
                 .andExpect(jsonPath("$.content[0].lastname").value("Lewandowski"))
@@ -118,10 +122,12 @@ class StudentControllerTest {
 
         Student savedStudent = studentRepository.save(student);
 
-        postman.perform(delete("/api/v1/students/" + savedStudent.getId()))
+        postman.perform(delete("/api/v1/students/" + savedStudent.getId())
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4="))
                 .andExpect(status().isNoContent());
 
-        postman.perform(get("/api/v1/students/" + savedStudent.getId()))
+        postman.perform(get("/api/v1/students/" + savedStudent.getId())
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4="))
                 .andExpect(status().isNotFound());
     }
 
@@ -145,11 +151,13 @@ class StudentControllerTest {
         String commandString = mapper.writeValueAsString(command);
 
         postman.perform(patch("/api/v1/students/" + savedStudent.getId())
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(commandString))
                 .andExpect(status().isOk());
 
-        postman.perform(get("/api/v1/students/" + savedStudent.getId()))
+        postman.perform(get("/api/v1/students/" + savedStudent.getId())
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4="))
                 .andExpect(jsonPath("$.name").value("Robert"))
                 .andExpect(jsonPath("$.lastname").value("Blaszczykowski"));
     }
@@ -182,6 +190,7 @@ class StudentControllerTest {
         String commandString = mapper.writeValueAsString(command);
 
         postman.perform(patch("/api/v1/students/" + savedStudent.getId() + "/addSubject")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(commandString))
                 .andExpect(status().isOk());
@@ -215,6 +224,7 @@ class StudentControllerTest {
         String commandString = mapper.writeValueAsString(command);
 
         postman.perform(patch("/api/v1/students/" + savedStudent.getId() + "/addSubject")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(commandString))
                 .andExpect(status().isOk());
@@ -227,11 +237,13 @@ class StudentControllerTest {
         String commandString2 = mapper.writeValueAsString(command2);
 
         postman.perform(patch("/api/v1/students/" + savedStudent.getId() + "/deleteSubject")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(commandString2))
                 .andExpect(status().isOk());
 
-        postman.perform(get("/api/v1/students/" + savedStudent.getId()))
+        postman.perform(get("/api/v1/students/" + savedStudent.getId())
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4="))
                 .andExpect(jsonPath("$.name").value("Robert"))
                 .andExpect(jsonPath("$.lastname").value("Lewandowski"))
                 .andExpect(jsonPath("$.subjects").isEmpty());
