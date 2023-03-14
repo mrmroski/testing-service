@@ -1,7 +1,6 @@
 package com.javadevs.testingservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.javadevs.testingservice.DatabaseCleaner;
 import com.javadevs.testingservice.TestingServiceApplication;
 import com.javadevs.testingservice.model.Student;
 import com.javadevs.testingservice.model.Subject;
@@ -33,8 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("integration-tests")
 class StudentControllerTest {
 
-    @Autowired
-    private DatabaseCleaner databaseCleaner;
     @Autowired
     private StudentRepository studentRepository;
     @Autowired
@@ -75,7 +72,6 @@ class StudentControllerTest {
         student.setEmail("rl@02.pl");
         student.setStartedAt(LocalDate.now());
         student.setExams(new HashSet<>());
-        //student.setSubjectsCovered(new HashSet<>());
 
         Student savedStudent = studentRepository.save(student);
 
@@ -96,7 +92,6 @@ class StudentControllerTest {
         student.setEmail("rl@02.pl");
         student.setStartedAt(LocalDate.now());
         student.setExams(new HashSet<>());
-        //student.setSubjectsCovered(new HashSet<>());
 
         Student savedStudent = studentRepository.save(student);
 
@@ -118,7 +113,6 @@ class StudentControllerTest {
         student.setEmail("rl@02.pl");
         student.setStartedAt(LocalDate.now());
         student.setExams(new HashSet<>());
-        //student.setSubjectsCovered(new HashSet<>());
 
         Student savedStudent = studentRepository.save(student);
 
@@ -139,7 +133,6 @@ class StudentControllerTest {
         student.setEmail("rl@02.pl");
         student.setStartedAt(LocalDate.now());
         student.setExams(new HashSet<>());
-        //student.setSubjectsCovered(new HashSet<>());
 
         Student savedStudent = studentRepository.save(student);
 
@@ -171,14 +164,12 @@ class StudentControllerTest {
         student.setEmail("rl@02.pl");
         student.setStartedAt(LocalDate.now());
         student.setExams(new HashSet<>());
-        //student.setSubjectsCovered(new HashSet<>());
 
         Student savedStudent = studentRepository.save(student);
 
         Subject subject = new Subject();
         subject.setSubject("Petle");
         subject.setDescription("Wprowadzenie do petli");
-        //subject.setQuestions(new HashSet<>());
 
         Subject savedSubject = subjectRepository.save(subject);
 
@@ -205,14 +196,12 @@ class StudentControllerTest {
         student.setEmail("rl@02.pl");
         student.setStartedAt(LocalDate.now());
         student.setExams(new HashSet<>());
-        //student.setSubjectsCovered(new HashSet<>());
 
         Student savedStudent = studentRepository.save(student);
 
         Subject subject = new Subject();
         subject.setSubject("Petle");
         subject.setDescription("Wprowadzenie do petli");
-        //subject.setQuestions(new HashSet<>());
 
         Subject savedSubject = subjectRepository.save(subject);
 
