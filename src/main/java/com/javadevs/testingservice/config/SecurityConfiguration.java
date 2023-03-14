@@ -22,6 +22,9 @@ public class SecurityConfiguration {
         http.authorizeRequests()
                 .antMatchers(HttpMethod.POST,"api/v1/exams/{studentId}/addSubject").hasAnyRole("TEACHER","ADMIN")
                 .antMatchers(HttpMethod.POST,"api/v1/exams/{studentId}/deleteSubject").hasAnyRole("TEACHER","ADMIN")
+                .antMatchers("/h2-console/**").permitAll()
+                .antMatchers("/api/v1/exams/**/generator").permitAll()
+                .antMatchers("/api/v1/exams/**/submit").permitAll()
                 .anyRequest().hasRole("ADMIN")
                 .and()
                 .csrf().disable()
@@ -29,6 +32,8 @@ public class SecurityConfiguration {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .httpBasic();
+
+        http.headers().frameOptions().disable();
         return http.build();
     }
 
