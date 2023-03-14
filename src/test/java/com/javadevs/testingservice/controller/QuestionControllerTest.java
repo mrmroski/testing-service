@@ -1,9 +1,17 @@
 package com.javadevs.testingservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.javadevs.testingservice.model.Answer;
+import com.javadevs.testingservice.model.QuestionClosed;
+import com.javadevs.testingservice.model.QuestionOpen;
 import com.javadevs.testingservice.model.Subject;
 import com.javadevs.testingservice.model.command.create.CreateAnswerCommand;
+import com.javadevs.testingservice.model.command.create.CreateQuestionClosedCommand;
+import com.javadevs.testingservice.model.command.create.CreateQuestionOpenCommand;
 import com.javadevs.testingservice.model.command.create.CreateSubjectCommand;
+import com.javadevs.testingservice.model.command.edit.EditQuestionCommand;
+import com.javadevs.testingservice.model.command.questionEdit.AddAnswerCommand;
+import com.javadevs.testingservice.model.command.questionEdit.DeleteAnswerCommand;
 import com.javadevs.testingservice.repository.QuestionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,12 +22,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.NoSuchElementException;
 import java.util.Set;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -41,7 +51,7 @@ public class QuestionControllerTest {
     }
 
     @Test
-    void shouldAddQuestion() throws Exception {
+    void shouldSaveQuestionClosed() throws Exception {
         //given
         CreateSubjectCommand sCmd = CreateSubjectCommand.builder()
                 .subject("stolice")
@@ -49,414 +59,479 @@ public class QuestionControllerTest {
                 .build();
         String subjectS = mapper.writeValueAsString(sCmd);
 
-        String subResp = postman.perform(MockMvcRequestBuilders.post("/api/v1/subjects")
+        String subResp = postman.perform(post("/api/v1/subjects")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(subjectS))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        Subject subject = mapper.readValue(subResp, Subject.class);
-
-        Set<CreateAnswerCommand> answers = Set.of(
-                CreateAnswerCommand.builder().answer("waw").correct(Boolean.TRUE).build(),
-                CreateAnswerCommand.builder().answer("lub").correct(Boolean.FALSE).build(),
-                CreateAnswerCommand.builder().answer("gda").correct(Boolean.FALSE).build(),
-                CreateAnswerCommand.builder().answer("krk").correct(Boolean.FALSE).build()
-        );
-
-//        CreateQuestionCommand qCmd = CreateQuestionCommand.builder()
-//                .question("stolica polski?")
-//                .answers(answers)
-//                .subjectId(subject.getId())
-//                .build();
-       // String createQString = mapper.writeValueAsString(qCmd);
-
-        //when
-
-//        String response = postman.perform(MockMvcRequestBuilders.post("/api/v1/questions")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                       // .content(createQString))
-//                .andExpect(MockMvcResultMatchers.status().isCreated())
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.id").exists())
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.question").value("stolica polski?"))
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.questionType").value("MULTIPLE_CHOICE"))
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.subject.id").value(subject.getId()))
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.answers.length()").value(4))
-//                .andReturn()
-//                .getResponse()
-//                .getContentAsString();
-//        Question question = mapper.readValue(response, Question.class);
-
-        //then
-//        Question saved = questionRepository.findById(question.getId()).get();
-//        Assertions.assertEquals(saved.getQuestion(), "stolica polski?");
-//        Assertions.assertEquals(saved.getSubject(), subject);
-
-    }
-
-    @Test
-    void shouldGetAllQuestions() throws Exception {
-        //given
-        CreateSubjectCommand sCmd = CreateSubjectCommand.builder()
-                .subject("stolice")
-                .description("stolice 1")
-                .build();
-        String subjectS = mapper.writeValueAsString(sCmd);
-
-        String subResp = postman.perform(MockMvcRequestBuilders.post("/api/v1/subjects")
-                        .header(HttpHeaders.AUTHORIZATION,"Basic YWRtaW46YWRtaW4=")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(subjectS))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        Subject subject = mapper.readValue(subResp, Subject.class);
-
-        CreateSubjectCommand sCmd2 = CreateSubjectCommand.builder()
-                .subject("anatomia")
-                .description("dupy strona")
-                .build();
-
-        String subjectS2 = mapper.writeValueAsString(sCmd2);
-
-        String subResp2 = postman.perform(MockMvcRequestBuilders.post("/api/v1/subjects")
-                        .header(HttpHeaders.AUTHORIZATION,"Basic YWRtaW46YWRtaW4=")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(subjectS2))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        Subject subject2 = mapper.readValue(subResp2, Subject.class);
-
-        Set<CreateAnswerCommand> answers = Set.of(
-                CreateAnswerCommand.builder().answer("waw").correct(Boolean.TRUE).build(),
-                CreateAnswerCommand.builder().answer("lub").correct(Boolean.FALSE).build(),
-                CreateAnswerCommand.builder().answer("gda").correct(Boolean.FALSE).build(),
-                CreateAnswerCommand.builder().answer("krk").correct(Boolean.FALSE).build()
-        );
-
-
-//        CreateQuestionCommand qCmd = CreateQuestionCommand.builder()
-//                .question("stolica polski?")
-//                .answers(answers)
-//                .subjectId(subject.getId())
-//                .build();
-//        String createQString = mapper.writeValueAsString(qCmd);
-
-//        String respQ = postman.perform(MockMvcRequestBuilders.post("/api/v1/questions")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(createQString)
-//        ).andExpect(MockMvcResultMatchers.status().isCreated()).andReturn().getResponse().getContentAsString();
-//        Question question = mapper.readValue(respQ, Question.class);
-
-//        //when then
-//        postman.perform(MockMvcRequestBuilders.get("/api/v1/questions"))
-//                .andExpect(MockMvcResultMatchers.status().isOk())
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.content.length()").value(1))
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id").value(question.getId()))
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].question").value("stolica polski?"));
-        Set<CreateAnswerCommand> answers2 = Set.of(
-                CreateAnswerCommand.builder().answer("kupa").correct(Boolean.TRUE).build(),
-                CreateAnswerCommand.builder().answer("dupa").correct(Boolean.FALSE).build(),
-                CreateAnswerCommand.builder().answer("ass").correct(Boolean.FALSE).build(),
-                CreateAnswerCommand.builder().answer("anus").correct(Boolean.FALSE).build()
-        );
-
-
-
-//        CreateQuestionCommand qCmd2 = CreateQuestionCommand.builder()
-//                .question("Dupsko po lacinie?")
-//                .answers(answers2)
-//                .subjectId(subject2.getId())
-//                .build();
-//        String createQString2 = mapper.writeValueAsString(qCmd2);
-//
-//        String respQ2 = postman.perform(MockMvcRequestBuilders.post("/api/v1/questions")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(createQString2))
-//                .andExpect(MockMvcResultMatchers.status().isCreated())
-//                .andReturn()
-//                .getResponse()
-//                .getContentAsString();
-
-//        Question question2 = mapper.readValue(respQ2, Question.class);
-//
-//
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.content[1].id").value(question2.getId()))
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.content[1].question").value("Dupsko po lacinie?"));
-    }
-
-    @Test
-    void shouldGetQuestionById() throws Exception {
-        //given
-        CreateSubjectCommand sCmd = CreateSubjectCommand.builder()
-                .subject("stolice")
-                .description("stolice 1")
-                .build();
-        String subjectS = mapper.writeValueAsString(sCmd);
-
-        String subResp = postman.perform(MockMvcRequestBuilders.post("/api/v1/subjects")
-                        .header(HttpHeaders.AUTHORIZATION,"Basic YWRtaW46YWRtaW4=")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(subjectS))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        Subject subject = mapper.readValue(subResp, Subject.class);
-
-        Set<CreateAnswerCommand> answers = Set.of(
-                CreateAnswerCommand.builder().answer("waw").correct(Boolean.TRUE).build(),
-                CreateAnswerCommand.builder().answer("lub").correct(Boolean.FALSE).build(),
-                CreateAnswerCommand.builder().answer("gda").correct(Boolean.FALSE).build(),
-                CreateAnswerCommand.builder().answer("krk").correct(Boolean.FALSE).build()
-        );
-//
-//        CreateQuestionCommand qCmd = CreateQuestionCommand.builder()
-//                .question("stolica polski?")
-//                .answers(answers)
-//                .subjectId(subject.getId())
-//                .build();
-//        String createQString = mapper.writeValueAsString(qCmd);
-
-//        String respQ = postman.perform(MockMvcRequestBuilders.post("/api/v1/questions")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(createQString)
-//        ).andExpect(MockMvcResultMatchers.status().isCreated()).andReturn().getResponse().getContentAsString();
-//        Question question = mapper.readValue(respQ, Question.class);
-//
-//        //when then
-//        postman.perform(MockMvcRequestBuilders.get("/api/v1/questions/" + question.getId()))
-//                .andExpect(MockMvcResultMatchers.status().isOk())
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(question.getId()))
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.question").value("stolica polski?"));
-    }
-
-    @Test
-    void shouldDeleteQuestion() throws Exception {
-        //given
-        CreateSubjectCommand sCmd = CreateSubjectCommand.builder()
-                .subject("stolice")
-                .description("stolice 1")
-                .build();
-        String subjectS = mapper.writeValueAsString(sCmd);
-
-        String subResp = postman.perform(MockMvcRequestBuilders.post("/api/v1/subjects")
-                        .header(HttpHeaders.AUTHORIZATION,"Basic YWRtaW46YWRtaW4=")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(subjectS))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        Subject subject = mapper.readValue(subResp, Subject.class);
-
-        Set<CreateAnswerCommand> answers = Set.of(
-                CreateAnswerCommand.builder().answer("waw").correct(Boolean.TRUE).build(),
-                CreateAnswerCommand.builder().answer("lub").correct(Boolean.FALSE).build(),
-                CreateAnswerCommand.builder().answer("gda").correct(Boolean.FALSE).build(),
-                CreateAnswerCommand.builder().answer("krk").correct(Boolean.FALSE).build()
-        );
-
-//        CreateQuestionCommand qCmd = CreateQuestionCommand.builder()
-//                .question("stolica polski?")
-//                .answers(answers)
-//                .subjectId(subject.getId())
-//                .build();
-//        String createQString = mapper.writeValueAsString(qCmd);
-
-//        String respQ = postman.perform(MockMvcRequestBuilders.post("/api/v1/questions")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(createQString)
-//        ).andExpect(MockMvcResultMatchers.status().isCreated()).andReturn().getResponse().getContentAsString();
-//        Question question = mapper.readValue(respQ, Question.class);
-
-        //when
-//        postman.perform(MockMvcRequestBuilders.delete("/api/v1/questions/" + question.getId()))
-//                .andExpect(MockMvcResultMatchers.status().isNoContent());
-//
-//        //then
-//        Assertions.assertThrows(NoSuchElementException.class, () -> questionRepository.findById(question.getId()).get());
-    }
-
-    @Test
-    void shouldEditQuestion() throws Exception {
-        //given
-        CreateSubjectCommand sCmd = CreateSubjectCommand.builder()
-                .subject("stolice")
-                .description("stolice 1")
-                .build();
-        String subjectS = mapper.writeValueAsString(sCmd);
-
-        String subResp = postman.perform(MockMvcRequestBuilders.post("/api/v1/subjects")
-                        .header(HttpHeaders.AUTHORIZATION,"Basic YWRtaW46YWRtaW4=")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(subjectS))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        Subject subject = mapper.readValue(subResp, Subject.class);
-
-        Set<CreateAnswerCommand> answers = Set.of(
-                CreateAnswerCommand.builder().answer("waw").correct(Boolean.TRUE).build(),
-                CreateAnswerCommand.builder().answer("lub").correct(Boolean.FALSE).build(),
-                CreateAnswerCommand.builder().answer("gda").correct(Boolean.FALSE).build(),
-                CreateAnswerCommand.builder().answer("krk").correct(Boolean.FALSE).build()
-        );
-//
-//        CreateQuestionCommand qCmd = CreateQuestionCommand.builder()
-//                .question("stolica polski?")
-//                .answers(answers)
-//                .subjectId(subject.getId())
-//                .build();
-//        String createQString = mapper.writeValueAsString(qCmd);
-
-//        String respQ = postman.perform(MockMvcRequestBuilders.post("/api/v1/questions")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(createQString)
-//        ).andExpect(MockMvcResultMatchers.status().isCreated()).andReturn().getResponse().getContentAsString();
-//        Question question = mapper.readValue(respQ, Question.class);
-
-        //when
-    }
-
-    @Test
-    void shouldAddAnswer() throws Exception {
-        CreateSubjectCommand csc = CreateSubjectCommand.builder()
-                .subject("polski rap")
-                .description("podstawowa wiedza o polskim rapie")
-                .build();
-
-        String cscRequest = mapper.writeValueAsString(csc);
-
-        String cscResponse = postman.perform(post("/api/v1/subjects")
-                        .header(HttpHeaders.AUTHORIZATION,"Basic YWRtaW46YWRtaW4=")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(cscRequest))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
 
-        Subject subject = mapper.readValue(cscResponse, Subject.class);
+        Subject subject = mapper.readValue(subResp, Subject.class);
 
-        Set<CreateAnswerCommand> cacSet = Set.of(
-                CreateAnswerCommand.builder().answer("bo tak").correct(false).build(),
-                CreateAnswerCommand.builder().answer("nie jest").correct(false).build()
+        Set<CreateAnswerCommand> answers = Set.of(
+                CreateAnswerCommand.builder().answer("waw").correct(Boolean.TRUE).build(),
+                CreateAnswerCommand.builder().answer("lub").correct(Boolean.FALSE).build(),
+                CreateAnswerCommand.builder().answer("gda").correct(Boolean.FALSE).build(),
+                CreateAnswerCommand.builder().answer("krk").correct(Boolean.FALSE).build()
         );
 
-//        CreateQuestionCommand cqc = CreateQuestionCommand.builder()
-//                .question("Dlaczego Tede kurwą jest")
-//                .answers(cacSet)
-//                .subjectId(subject.getId()).build();
+        CreateQuestionClosedCommand questionClosedCommand = CreateQuestionClosedCommand.builder()
+                .question("Stolica Polski?")
+                .subjectId(subject.getId())
+                .answers(answers).build();
 
-//        String cqcRequest = mapper.writeValueAsString(cqc);
-//
-//        String cqcResponse = postman.perform(post("/api/v1/questions")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(cqcRequest))
-//                .andExpect(status().isCreated())
-//                .andReturn()
-//                .getResponse()
-//                .getContentAsString();
-//
-//        Question question = mapper.readValue(cqcResponse, Question.class);
-//
-//        AddAnswerCommand aac = AddAnswerCommand.builder()
-//                .questionId(question.getId())
-//                .answer("Bo Peja tak nawinął")
-//                .correct(true).build();
+        String questionClosedCommandReq = mapper.writeValueAsString(questionClosedCommand);
 
-//        String aacRequest = mapper.writeValueAsString(aac);
-//
-//        postman.perform(patch("/api/v1/questions/" + question.getId() + "/addAnswer")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(aacRequest))
-////                .andExpect(status().isOk())
-////                .andReturn()
-//                .getResponse()
-//                .getContentAsString();
-//
-//        postman.perform(get("/api/v1/questions/" + question.getId()))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.id").value(question.getId()))
-//                .andExpect(jsonPath("$.question").value("Dlaczego Tede kurwą jest"))
-//                .andExpect(jsonPath("$.subject.id").value(question.getSubject().getId()))
-//                .andExpect(jsonPath("$.answers.[*].answer", containsInAnyOrder("Bo Peja tak nawinął", "bo tak", "nie jest")));
-//    }
+        //when
 
-//    @Test
-//    void shouldDeleteAnswer() throws Exception {
-//        CreateSubjectCommand csc = CreateSubjectCommand.builder()
-//                .subject("polski rap")
-//                .description("podstawowa wiedza o polskim rapie")
-//                .build();
-//
-//        String cscRequest = mapper.writeValueAsString(csc);
-//
-//        String cscResponse = postman.perform(post("/api/v1/subjects")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(cscRequest))
-//                .andExpect(status().isCreated())
-//                .andReturn()
-//                .getResponse()
-//                .getContentAsString();
-//
-//        Subject subject = mapper.readValue(cscResponse, Subject.class);
-//
-//        Set<CreateAnswerCommand> cacSet = Set.of(
-//                CreateAnswerCommand.builder().answer("bo tak").correct(false).build(),
-//                CreateAnswerCommand.builder().answer("nie jest").correct(false).build(),
-//                CreateAnswerCommand.builder().answer("Bo Peja tak nawinal").correct(true).build()
-//        );
+        String response = postman.perform(post("/api/v1/questions/closed")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(questionClosedCommandReq))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.question").value("Stolica Polski?"))
+                .andExpect(jsonPath("$.subject.id").value(subject.getId()))
+                .andExpect(jsonPath("$.answers.length()").value(4))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
-//        CreateQuestionCommand cqc = CreateQuestionCommand.builder()
-//                .question("Dlaczego Tede kurwą jest")
-//                .answers(cacSet)
-//                .subjectId(subject.getId()).build();
-//
-//        String cqcRequest = mapper.writeValueAsString(cqc);
+        QuestionClosed question = mapper.readValue(response, QuestionClosed.class);
 
-//        String cqcResponse = postman.perform(post("/api/v1/questions")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(cqcRequest))
-//                .andExpect(status().isCreated())
-//                .andReturn()
-//                .getResponse()
-//                .getContentAsString();
+        //then
 
-//        Question question = mapper.readValue(cqcResponse, Question.class);
+        QuestionClosed saved = (QuestionClosed) questionRepository.findByIdWithAnswers(question.getId()).get();
+        assertEquals(saved.getQuestion(), "Stolica Polski?");
+        assertEquals(saved.getSubject().getId(), subject.getId());
+        assertEquals(question.getId(), saved.getId());
+        assertEquals(answers.size(), saved.getAnswers().size());
+    }
 
-//        postman.perform(get("/api/v1/questions/" + question.getId())
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.id").value(question.getId()))
-//                .andExpect(jsonPath("$.question").value("Dlaczego Tede kurwą jest"))
-//                .andExpect(jsonPath("$.subject.id").value(question.getSubject().getId()))
-//                .andExpect(jsonPath("$.answers.[*].answer", containsInAnyOrder("Bo Peja tak nawinal","bo tak", "nie jest")));
+    @Test
+    void shouldSaveQuestionOpen() throws Exception {
+        CreateSubjectCommand sCmd = CreateSubjectCommand.builder()
+                .subject("proste pytania")
+                .description("proste odpowiedzi na proste pytania")
+                .build();
+        String subjectS = mapper.writeValueAsString(sCmd);
 
-//        Long answerToDeleteId = question.getAnswers().stream()
-//                .filter(answer -> answer.getAnswer().contains("Bo Peja tak nawinal"))
-//                .map(Answer::getId).findFirst().orElseThrow(NoSuchElementException::new);
+        String subResp = postman.perform(post("/api/v1/subjects")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(subjectS))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
-//        DeleteAnswerCommand dac = DeleteAnswerCommand.builder()
-//                .answerId(answerToDeleteId)
-//                .questionId(question.getId()).build();
+        Subject subject = mapper.readValue(subResp, Subject.class);
 
-//        String dacRequest = mapper.writeValueAsString(dac);
-//
-//        postman.perform(patch("/api/v1/questions/" + question.getId() + "/deleteAnswer")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(dacRequest))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.id").value(question.getId()))
-//                .andExpect(jsonPath("$.question").value("Dlaczego Tede kurwą jest"))
-//                .andExpect(jsonPath("$.subject.id").value(question.getSubject().getId()))
-//                .andExpect(jsonPath("$.answers.[*].answer", containsInAnyOrder("bo tak", "nie jest")));
- }
+        CreateQuestionOpenCommand openCommand = CreateQuestionOpenCommand.builder()
+                .question("tak czy nie ?")
+                .subjectId(subject.getId())
+                .answer("tak").build();
+
+        String openCommandReq = mapper.writeValueAsString(openCommand);
+
+        String openCommandResponse = postman.perform(post("/api/v1/questions/open")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(openCommandReq))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.question").value("tak czy nie ?"))
+                .andExpect(jsonPath("$.subject.id").value(subject.getId()))
+                .andExpect(jsonPath("$.answer").value("tak"))
+                .andReturn().getResponse().getContentAsString();
+
+        QuestionOpen saved = mapper.readValue(openCommandResponse, QuestionOpen.class);
+
+        QuestionOpen found = (QuestionOpen) questionRepository.findOneWithAnswersSubject(saved.getId()).get();
+
+        assertEquals(saved.getId(), found.getId());
+        assertEquals(saved.getVersion(), found.getVersion());
+        assertEquals("tak czy nie ?", found.getQuestion());
+        assertEquals("tak", found.getAnswer());
+        assertEquals("proste pytania", found.getSubject().getSubject());
+        assertEquals("proste odpowiedzi na proste pytania", found.getSubject().getDescription());
+        assertEquals(subject.getId(), found.getSubject().getId());
+    }
+
+    @Test
+    void shouldGetQuestionById() throws Exception {
+        CreateSubjectCommand sCmd = CreateSubjectCommand.builder()
+                .subject("proste pytania")
+                .description("proste odpowiedzi na proste pytania")
+                .build();
+        String subjectS = mapper.writeValueAsString(sCmd);
+
+        String subResp = postman.perform(post("/api/v1/subjects")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(subjectS))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Subject subject = mapper.readValue(subResp, Subject.class);
+
+        CreateQuestionOpenCommand openCommand = CreateQuestionOpenCommand.builder()
+                .question("tak czy nie ?")
+                .subjectId(subject.getId())
+                .answer("tak").build();
+
+        String openCommandReq = mapper.writeValueAsString(openCommand);
+
+        String openCommandResponse = postman.perform(post("/api/v1/questions/open")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(openCommandReq))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.question").value("tak czy nie ?"))
+                .andExpect(jsonPath("$.subject.id").value(subject.getId()))
+                .andExpect(jsonPath("$.answer").value("tak"))
+                .andReturn().getResponse().getContentAsString();
+
+        QuestionOpen saved = mapper.readValue(openCommandResponse, QuestionOpen.class);
+
+        postman.perform(get("/api/v1/questions/" + saved.getId())
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4="))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(saved.getId()))
+                .andExpect(jsonPath("$.question").value("tak czy nie ?"))
+                .andExpect(jsonPath("$.subject.id").value(subject.getId()));
+    }
+
+    @Test
+    void shouldFindAllQuestions() throws Exception {
+        //given
+        CreateSubjectCommand sCmd = CreateSubjectCommand.builder()
+                .subject("stolice")
+                .description("stolice 1")
+                .build();
+        String subjectS = mapper.writeValueAsString(sCmd);
+
+        String subResp = postman.perform(post("/api/v1/subjects")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(subjectS))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Subject subject = mapper.readValue(subResp, Subject.class);
+
+        Set<CreateAnswerCommand> answers = Set.of(
+                CreateAnswerCommand.builder().answer("waw").correct(Boolean.TRUE).build(),
+                CreateAnswerCommand.builder().answer("lub").correct(Boolean.FALSE).build(),
+                CreateAnswerCommand.builder().answer("gda").correct(Boolean.FALSE).build(),
+                CreateAnswerCommand.builder().answer("krk").correct(Boolean.FALSE).build()
+        );
+
+        CreateQuestionClosedCommand questionClosedCommand = CreateQuestionClosedCommand.builder()
+                .question("Stolica Polski?")
+                .subjectId(subject.getId())
+                .answers(answers).build();
+
+        String questionClosedCommandReq = mapper.writeValueAsString(questionClosedCommand);
+
+        //when
+
+        String response = postman.perform(post("/api/v1/questions/closed")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(questionClosedCommandReq))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.question").value("Stolica Polski?"))
+                .andExpect(jsonPath("$.subject.id").value(subject.getId()))
+                .andExpect(jsonPath("$.answers.length()").value(4))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        QuestionClosed savedClosed = mapper.readValue(response, QuestionClosed.class);
+
+        CreateQuestionOpenCommand openCommand = CreateQuestionOpenCommand.builder()
+                .question("tak czy nie ?")
+                .subjectId(subject.getId())
+                .answer("tak").build();
+
+        String openCommandReq = mapper.writeValueAsString(openCommand);
+
+        String openCommandResponse = postman.perform(post("/api/v1/questions/open")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(openCommandReq))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.question").value("tak czy nie ?"))
+                .andExpect(jsonPath("$.subject.id").value(subject.getId()))
+                .andExpect(jsonPath("$.answer").value("tak"))
+                .andReturn().getResponse().getContentAsString();
+
+        QuestionOpen savedOpen = mapper.readValue(openCommandResponse, QuestionOpen.class);
+
+        postman.perform(get("/api/v1/questions")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4="))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(savedClosed.getId()))
+                .andExpect(jsonPath("$.content[0].subject.id").value(subject.getId()))
+                .andExpect(jsonPath("$.content[0].answers.size()").value(answers.size()))
+                .andExpect(jsonPath("$.content[0].question").value("Stolica Polski?"))
+                .andExpect(jsonPath("$.content[1].id").value(savedOpen.getId()))
+                .andExpect(jsonPath("$.content[1].subject.id").value(subject.getId()))
+                .andExpect(jsonPath("$.content[1].answer").value("tak"))
+                .andExpect(jsonPath("$.content[1].question").value("tak czy nie ?"));
+
+    }
+
+    @Test
+    void shouldDeleteQuestion() throws Exception {
+        CreateSubjectCommand sCmd = CreateSubjectCommand.builder()
+                .subject("proste pytania")
+                .description("proste odpowiedzi na proste pytania")
+                .build();
+        String subjectS = mapper.writeValueAsString(sCmd);
+
+        String subResp = postman.perform(post("/api/v1/subjects")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(subjectS))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Subject subject = mapper.readValue(subResp, Subject.class);
+
+        CreateQuestionOpenCommand openCommand = CreateQuestionOpenCommand.builder()
+                .question("tak czy nie ?")
+                .subjectId(subject.getId())
+                .answer("tak").build();
+
+        String openCommandReq = mapper.writeValueAsString(openCommand);
+
+        String openCommandResponse = postman.perform(post("/api/v1/questions/open")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(openCommandReq))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.question").value("tak czy nie ?"))
+                .andExpect(jsonPath("$.subject.id").value(subject.getId()))
+                .andExpect(jsonPath("$.answer").value("tak"))
+                .andReturn().getResponse().getContentAsString();
+
+        QuestionOpen saved = mapper.readValue(openCommandResponse, QuestionOpen.class);
+
+        postman.perform(delete("/api/v1/questions/" + saved.getId())
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4="))
+                .andExpect(status().isNoContent());
+
+        postman.perform(get("/api/v1/questions/" + saved.getId())
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4="))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("QUESTION_NOT_FOUND"))
+                .andExpect(jsonPath("$.questionId").value(saved.getId()));
+    }
+
+    @Test
+    void shouldEditQuestionPartially() throws Exception {
+        CreateSubjectCommand sCmd = CreateSubjectCommand.builder()
+                .subject("proste pytania")
+                .description("proste odpowiedzi na proste pytania")
+                .build();
+        String subjectS = mapper.writeValueAsString(sCmd);
+
+        String subResp = postman.perform(post("/api/v1/subjects")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(subjectS))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Subject subject = mapper.readValue(subResp, Subject.class);
+
+        CreateQuestionOpenCommand openCommand = CreateQuestionOpenCommand.builder()
+                .question("tak czy nie ?")
+                .subjectId(subject.getId())
+                .answer("tak").build();
+
+        String openCommandReq = mapper.writeValueAsString(openCommand);
+
+        String openCommandResponse = postman.perform(post("/api/v1/questions/open")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(openCommandReq))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.question").value("tak czy nie ?"))
+                .andExpect(jsonPath("$.subject.id").value(subject.getId()))
+                .andExpect(jsonPath("$.answer").value("tak"))
+                .andReturn().getResponse().getContentAsString();
+
+        QuestionOpen saved = mapper.readValue(openCommandResponse, QuestionOpen.class);
+
+        EditQuestionCommand editQuestionCommand = EditQuestionCommand.builder()
+                .question("nie czy tak?")
+                .version(saved.getVersion())
+                .subjectId(subject.getId()).build();
+
+        String editQuestionReq = mapper.writeValueAsString(editQuestionCommand);
+
+        postman.perform(patch("/api/v1/questions/" + saved.getId())
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(editQuestionReq))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(saved.getId()))
+                .andExpect(jsonPath("$.question").value("nie czy tak?"))
+                .andExpect(jsonPath("$.subject.id").value(subject.getId()))
+                .andExpect(jsonPath("$.answer").value("tak"));
+    }
+
+    @Test
+    void shouldAddAnswer() throws Exception {
+        CreateSubjectCommand sCmd = CreateSubjectCommand.builder()
+                .subject("stolice")
+                .description("stolice 1")
+                .build();
+        String subjectS = mapper.writeValueAsString(sCmd);
+
+        String subResp = postman.perform(post("/api/v1/subjects")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(subjectS))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Subject subject = mapper.readValue(subResp, Subject.class);
+
+        Set<CreateAnswerCommand> answers = Set.of(
+                CreateAnswerCommand.builder().answer("waw").correct(Boolean.TRUE).build(),
+                CreateAnswerCommand.builder().answer("lub").correct(Boolean.FALSE).build(),
+                CreateAnswerCommand.builder().answer("gda").correct(Boolean.FALSE).build(),
+                CreateAnswerCommand.builder().answer("krk").correct(Boolean.FALSE).build()
+        );
+
+        CreateQuestionClosedCommand questionClosedCommand = CreateQuestionClosedCommand.builder()
+                .question("Stolica Polski?")
+                .subjectId(subject.getId())
+                .answers(answers).build();
+
+        String questionClosedCommandReq = mapper.writeValueAsString(questionClosedCommand);
+
+        String response = postman.perform(post("/api/v1/questions/closed")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(questionClosedCommandReq))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.question").value("Stolica Polski?"))
+                .andExpect(jsonPath("$.subject.id").value(subject.getId()))
+                .andExpect(jsonPath("$.answers.length()").value(4))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        QuestionClosed saved = mapper.readValue(response, QuestionClosed.class);
+
+
+        AddAnswerCommand aac = AddAnswerCommand.builder()
+                .questionId(saved.getId())
+                .answer("poz")
+                .correct(false).build();
+
+        String aacRequest = mapper.writeValueAsString(aac);
+
+        postman.perform(patch("/api/v1/questions/" + saved.getId() + "/addAnswer")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(aacRequest))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(saved.getId()))
+                .andExpect(jsonPath("$.question").value(saved.getQuestion()))
+                .andExpect(jsonPath("$.subject.id").value(saved.getSubject().getId()))
+                .andExpect(jsonPath("$.answers.[*].answer", containsInAnyOrder("waw", "lub", "gda", "krk", "poz")));
+    }
+
+    @Test
+    void shouldDeleteAnswer() throws Exception {
+        CreateSubjectCommand sCmd = CreateSubjectCommand.builder()
+                .subject("stolice")
+                .description("stolice 1")
+                .build();
+        String subjectS = mapper.writeValueAsString(sCmd);
+
+        String subResp = postman.perform(post("/api/v1/subjects")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(subjectS))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Subject subject = mapper.readValue(subResp, Subject.class);
+
+        Set<CreateAnswerCommand> answers = Set.of(
+                CreateAnswerCommand.builder().answer("waw").correct(Boolean.TRUE).build(),
+                CreateAnswerCommand.builder().answer("lub").correct(Boolean.FALSE).build(),
+                CreateAnswerCommand.builder().answer("gda").correct(Boolean.FALSE).build(),
+                CreateAnswerCommand.builder().answer("krk").correct(Boolean.FALSE).build()
+        );
+
+        CreateQuestionClosedCommand questionClosedCommand = CreateQuestionClosedCommand.builder()
+                .question("Stolica Polski?")
+                .subjectId(subject.getId())
+                .answers(answers).build();
+
+        String questionClosedCommandReq = mapper.writeValueAsString(questionClosedCommand);
+
+        String response = postman.perform(post("/api/v1/questions/closed")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(questionClosedCommandReq))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.question").value("Stolica Polski?"))
+                .andExpect(jsonPath("$.subject.id").value(subject.getId()))
+                .andExpect(jsonPath("$.answers.length()").value(4))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        QuestionClosed saved = mapper.readValue(response, QuestionClosed.class);
+
+        Long answerToDeleteId = saved.getAnswers().stream()
+                .filter(answer -> answer.getAnswer().contains("lub"))
+                .map(Answer::getId).findFirst().orElseThrow(NoSuchElementException::new);
+
+        DeleteAnswerCommand dac = DeleteAnswerCommand.builder()
+                .answerId(answerToDeleteId)
+                .questionId(saved.getId()).build();
+
+        String dacRequest = mapper.writeValueAsString(dac);
+
+        postman.perform(patch("/api/v1/questions/" + saved.getId() + "/deleteAnswer")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(dacRequest))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(saved.getId()))
+                .andExpect(jsonPath("$.question").value("Stolica Polski?"))
+                .andExpect(jsonPath("$.subject.id").value(saved.getSubject().getId()))
+                .andExpect(jsonPath("$.answers.[*].answer", containsInAnyOrder("waw", "gda", "krk")));
+    }
 }
